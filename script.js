@@ -58,6 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (Telegram.WebApp.setHeaderColor) {
             Telegram.WebApp.setHeaderColor('secondary_bg_color'); // Используем цвет фона заголовка Telegram
         }
+        // Отключаем pull-to-refresh, чтобы не мешать свайпам
+        Telegram.WebApp.disableVerticalSwipes();
     }
 
     // Загружаем данные из localStorage
@@ -261,10 +263,11 @@ function renderVideos() {
         // Обработчик двойного тапа для лайка
         let lastTap = 0;
         videoElement.addEventListener('touchend', function(event) {
+            // Предотвращаем стандартное поведение (зум) при двойном тапе
+            event.preventDefault(); 
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
             if (tapLength < 300 && tapLength > 0) { // Двойной тап
-                event.preventDefault();
                 if (index === currentVideoIndex) { // Лайкаем только активное видео
                     toggleLike();
                     showDoubleTapLikeAnimation(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
@@ -275,6 +278,8 @@ function renderVideos() {
 
         // Обработчик двойного клика для лайка на десктопе
         videoElement.addEventListener('dblclick', function(event) {
+            // Предотвращаем стандартное поведение (зум) при двойном клике
+            event.preventDefault();
             if (index === currentVideoIndex) { // Лайкаем только активное видео
                 toggleLike();
                 showDoubleTapLikeAnimation(event.clientX, event.clientY);
@@ -408,14 +413,21 @@ function setupVideoNavigation() {
     document.addEventListener('touchstart', (e) => {
         startY = e.touches[0].clientY;
         isScrolling = false;
-    });
-    
+    }, { passive: false }); // passive: false для предотвращения прокрутки страницы
+
     document.addEventListener('touchmove', (e) => {
-        if (!isScrolling) {
-            const currentY = e.touches[0].clientY;
-            const diffY = startY - currentY;
-            
-            if (Math.abs(diffY) > 50) { // Порог для свайпа
+        // Если открыто модальное окно, не обрабатываем свайпы для видео
+        if (commentModal.classList.contains('active') || profileModal.classList.contains('active')) {
+            return;
+        }
+
+        const currentY = e.touches[0].clientY;
+        const diffY = startY - currentY;
+        
+        // Предотвращаем прокрутку страницы, если это свайп для видео
+        if (Math.abs(diffY) > 10) { // Небольшой порог для начала свайпа
+            e.preventDefault(); 
+            if (!isScrolling) {
                 isScrolling = true;
                 
                 if (diffY > 0 && currentVideoIndex < videos.length - 1) {
@@ -427,26 +439,40 @@ function setupVideoNavigation() {
                 }
             }
         }
-    });
+    }, { passive: false }); // passive: false для предотвращения прокрутки страницы
     
     // Обработка колесика мыши на десктопе
     document.addEventListener('wheel', (e) => {
         if (isTransitioning) return;
+        
+        // Если открыто модальное окно, не обрабатываем прокрутку для видео
+        if (commentModal.classList.contains('active') || profileModal.classList.contains('active')) {
+            return;
+        }
+
+        e.preventDefault(); // Предотвращаем прокрутку страницы
         
         if (e.deltaY > 50 && currentVideoIndex < videos.length - 1) { // Прокрутка вниз - следующее видео
             updateVideoDisplay(currentVideoIndex + 1);
         } else if (e.deltaY < -50 && currentVideoIndex > 0) { // Покрутка вверх - предыдущее видео
             updateVideoDisplay(currentVideoIndex - 1);
         }
-    });
+    }, { passive: false }); // passive: false для предотвращения прокрутки страницы
     
     // Обработка клавиш стрелок на клавиатуре
     document.addEventListener('keydown', (e) => {
         if (isTransitioning) return;
         
+        // Если открыто модальное окно, не обрабатываем клавиши для видео
+        if (commentModal.classList.contains('active') || profileModal.classList.contains('active')) {
+            return;
+        }
+
         if (e.key === 'ArrowDown' && currentVideoIndex < videos.length - 1) {
+            e.preventDefault(); // Предотвращаем прокрутку страницы
             updateVideoDisplay(currentVideoIndex + 1);
         } else if (e.key === 'ArrowUp' && currentVideoIndex > 0) {
+            e.preventDefault(); // Предотвращаем прокрутку страницы
             updateVideoDisplay(currentVideoIndex - 1);
         }
     });
@@ -462,9 +488,14 @@ function setupMenuToggleOnSwipe() {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
         isSwiping = false;
-    });
+    }, { passive: false });
 
     document.addEventListener('touchmove', (e) => {
+        // Если открыто модальное окно, не обрабатываем свайпы для меню
+        if (commentModal.classList.contains('active') || profileModal.classList.contains('active')) {
+            return;
+        }
+
         if (isSwiping) return; 
         
         const currentX = e.touches[0].clientX;
@@ -474,6 +505,7 @@ function setupMenuToggleOnSwipe() {
 
         // Определяем, является ли движение горизонтальным свайпом и достаточно ли оно значимо
         if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) { 
+            e.preventDefault(); // Предотвращаем прокрутку страницы
             isSwiping = true;
             if (diffX > 0 && !menuVisible) { // Свайп вправо - показать меню
                 toggleMenuVisibility(true);
@@ -481,7 +513,7 @@ function setupMenuToggleOnSwipe() {
                 toggleMenuVisibility(false);
             }
         }
-    });
+    }, { passive: false });
 
     document.addEventListener('touchend', () => {
         isSwiping = false;
@@ -562,12 +594,20 @@ function showComments() {
     renderComments(video.id);
     commentModal.classList.add('active');
     commentText.focus();
+    // Отключаем свайпы в Telegram Web App, пока модальное окно открыто
+    if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.disableVerticalSwipes();
+    }
 }
 
 // Скрыть комментарии
 function hideComments() {
     commentModal.classList.remove('active');
     commentText.value = '';
+    // Включаем свайпы в Telegram Web App, когда модальное окно закрыто
+    if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.enableVerticalSwipes();
+    }
 }
 
 // Рендеринг комментариев
@@ -575,7 +615,7 @@ function renderComments(videoId) {
     commentsList.innerHTML = '';
     
     if (!comments[videoId] || comments[videoId].length === 0) {
-        commentsList.innerHTML = '<p style="text-align: center; color: var(--gray);">Пока нет комментариев. Будьте первым!</p>';
+        commentsList.innerHTML = '<p class="empty-state">Пока нет комментариев. Будьте первым!</p>';
         return;
     }
     
@@ -600,7 +640,7 @@ function addComment() {
     const text = commentText.value.trim();
     
     if (!text) {
-        alert('Пожалуйста, введите текст комментария');
+        showNotification('Пожалуйста, введите текст комментария', 'error');
         return;
     }
     
@@ -664,11 +704,19 @@ function showProfileModal() {
     renderSubscriptions();
     renderNotifications();
     profileModal.classList.add('active');
+    // Отключаем свайпы в Telegram Web App, пока модальное окно открыто
+    if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.disableVerticalSwipes();
+    }
 }
 
 // Скрыть модальное окно профиля
 function hideProfileModal() {
     profileModal.classList.remove('active');
+    // Включаем свайпы в Telegram Web App, когда модальное окно закрыто
+    if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.enableVerticalSwipes();
+    }
 }
 
 // Рендеринг сохраненных видео
