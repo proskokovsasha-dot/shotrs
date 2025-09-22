@@ -12,14 +12,10 @@
     <div id="mainPage">
         <header class="header">
             <h1 class="logo">ТочкаСхода</h1>
-            <div id="authButtons" class="auth-buttons">
-                <button id="loginBtn" class="auth-btn">Войти</button>
-                <button id="registerBtn" class="auth-btn">Регистрация</button>
-            </div>
-            <div id="userMenu" class="user-menu hidden">
-                <span id="userName" class="user-name"></span>
+            <!-- Теперь всегда отображается меню пользователя -->
+            <div id="userMenu" class="user-menu">
+                <span id="userName" class="user-name">Гость</span> <!-- Имя пользователя по умолчанию -->
                 <button id="profileBtn" class="auth-btn">Профиль</button>
-                <button id="logoutBtn" class="auth-btn">Выйти</button>
             </div>
         </header>
         
@@ -40,47 +36,10 @@
                 </button>
                 <button id="saveBtn" class="control-btn">
                     <i class="far fa-bookmark"></i>
-                    <!-- Надпись "Сохранить" удалена -->
                 </button>
                 <button id="shareBtn" class="control-btn">
                     <i class="fas fa-share"></i>
                 </button>
-            </div>
-        </div>
-        
-        <!-- Модальное окно авторизации -->
-        <div id="authModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="authModalTitle">Войдите в аккаунт</h3>
-                    <button id="closeAuthModal" class="close-btn">&times;</button>
-                </div>
-                <div class="auth-forms">
-                    <div id="loginForm" class="auth-form active">
-                        <div class="input-group">
-                            <input type="text" id="username" placeholder="Имя пользователя" required>
-                        </div>
-                        <div class="input-group">
-                            <input type="password" id="password" placeholder="Пароль" required>
-                        </div>
-                        <button id="submitLogin" class="btn-primary">Войти</button>
-                        <p class="auth-switch">Нет аккаунта? <span id="showRegister">Зарегистрироваться</span></p>
-                    </div>
-                    
-                    <div id="registerForm" class="auth-form hidden">
-                        <div class="input-group">
-                            <input type="text" id="regUsername" placeholder="Имя пользователя" required>
-                        </div>
-                        <div class="input-group">
-                            <input type="email" id="regEmail" placeholder="Email" required>
-                        </div>
-                        <div class="input-group">
-                            <input type="password" id="regPassword" placeholder="Пароль" required>
-                        </div>
-                        <button id="submitRegister" class="btn-primary">Зарегистрироваться</button>
-                        <p class="auth-switch">Уже есть аккаунт? <span id="showLogin">Войти</span></p>
-                    </div>
-                </div>
             </div>
         </div>
         
@@ -109,8 +68,8 @@
                     <button id="closeProfileModal" class="close-btn">&times;</button>
                 </div>
                 <div class="profile-content">
-                    <p><strong>Имя пользователя:</strong> <span id="profileUsername"></span></p>
-                    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+                    <p><strong>Имя пользователя:</strong> <span id="profileUsername">Гость</span></p>
+                    <p><strong>Email:</strong> <span id="profileEmail">guest@example.com</span></p>
                     <h4>Сохраненные видео:</h4>
                     <div id="savedVideosList" class="saved-videos-list">
                         <!-- Сохраненные видео будут здесь -->

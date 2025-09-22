@@ -14,12 +14,13 @@
     --light: #FFFFFF;
     --gray: #B0B0B0;
     --success: #4CAF50;
+    --error: #f44336;
 }
 
 body {
     background-color: var(--dark);
     color: var(--light);
-    overflow: hidden; /* Убираем прокрутку, так как видео будут переключаться */
+    overflow: hidden;
     height: 100vh;
 }
 
@@ -29,7 +30,7 @@ body {
     height: 100vh;
     position: relative;
     background-color: #000;
-    overflow: hidden; /* Важно для плавного переключения видео */
+    overflow: hidden;
 }
 
 .header {
@@ -53,29 +54,26 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-.auth-buttons {
-    display: flex;
-    gap: 10px;
-}
+/* Убраны .auth-buttons, .auth-btn, .hidden, так как они больше не нужны */
 
 .user-menu {
     display: flex;
     align-items: center;
-    gap: 15px; /* Увеличиваем расстояние между элементами */
-    padding: 5px 10px; /* Добавляем небольшой внутренний отступ */
-    border-radius: 20px; /* Скругляем углы для эстетики */
-    background-color: rgba(255, 255, 255, 0.1); /* Легкий фон для выделения */
-    backdrop-filter: blur(5px); /* Размытие фона */
+    gap: 15px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
     color: var(--light);
 }
 
 .user-name {
     font-weight: 600;
     color: var(--light);
-    white-space: nowrap; /* Предотвращаем перенос имени пользователя */
+    white-space: nowrap;
 }
 
-.auth-btn {
+.auth-btn { /* Переименован в .profile-btn для ясности, но сохранил стили */
     padding: 8px 15px;
     border: none;
     border-radius: 20px;
@@ -91,27 +89,12 @@ body {
     background-color: var(--primary);
 }
 
-.user-avatar {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: linear-gradient(to right, var(--primary), var(--secondary));
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* Контейнер для всех видео, чтобы обеспечить плавное переключение */
+/* Контейнер для видео */
 .video-carousel {
     width: 100%;
     height: 100vh;
     position: relative;
-    overflow: hidden; /* Скрывает видео, которые не в фокусе */
+    overflow: hidden;
 }
 
 .video-item {
@@ -124,26 +107,26 @@ body {
     justify-content: center;
     align-items: center;
     background-color: #000;
-    transition: transform 0.5s ease-in-out; /* Плавный переход при смене видео */
-    transform: translateY(100%); /* Скрываем видео по умолчанию */
+    transition: transform 0.5s ease-in-out;
+    transform: translateY(100%);
 }
 
 .video-item.active {
-    transform: translateY(0); /* Активное видео на экране */
+    transform: translateY(0);
 }
 
 .video-item.prev {
-    transform: translateY(-100%); /* Предыдущее видео уходит вверх */
+    transform: translateY(-100%);
 }
 
 .video-item.next {
-    transform: translateY(100%); /* Следующее видео приходит снизу */
+    transform: translateY(100%);
 }
 
 .video-item video {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Видео заполняет весь контейнер */
+    object-fit: cover;
 }
 
 .video-info {
@@ -153,7 +136,7 @@ body {
     right: 20px;
     color: white;
     z-index: 2;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* Улучшаем читаемость текста */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
 .video-title {
@@ -177,73 +160,72 @@ body {
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    flex-shrink: 0; /* Предотвращаем сжатие аватара */
+    flex-shrink: 0;
 }
 
-/* Элементы управления видео теперь справа */
+/* Элементы управления видео */
 .video-controls {
     position: fixed;
-    bottom: 20px; /* Отступ снизу */
-    right: 20px; /* Отступ справа */
+    bottom: 20px;
+    right: 20px;
     display: flex;
-    flex-direction: column; /* Элементы управления располагаются вертикально */
-    gap: 15px; /* Расстояние между кнопками */
+    flex-direction: column;
+    gap: 15px;
     z-index: 10;
 }
 
 .control-group {
     display: flex;
-    flex-direction: column; /* Кнопки внутри группы также вертикально */
-    align-items: center; /* Центрируем элементы по горизонтали */
+    flex-direction: column;
+    align-items: center;
     gap: 15px;
     background-color: rgba(30, 30, 30, 0.7);
-    padding: 15px 10px; /* Уменьшаем padding по горизонтали для компактности */
+    padding: 15px 10px;
     border-radius: 30px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Добавляем тень для объема */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .control-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Центрируем иконку и текст */
+    justify-content: center;
     gap: 5px;
     background: none;
     border: none;
     color: var(--light);
-    font-size: 1.3rem; /* Увеличиваем размер иконок */
+    font-size: 1.3rem;
     cursor: pointer;
-    transition: all 0.3s ease; /* Более плавный переход */
-    padding: 8px; /* Уменьшаем padding для компактности */
-    border-radius: 50%; /* Делаем кнопки круглыми */
-    width: 50px; /* Фиксированная ширина */
-    height: 50px; /* Фиксированная высота */
-    position: relative; /* Для позиционирования счетчика */
+    transition: all 0.3s ease;
+    padding: 8px;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    position: relative;
 }
 
 .control-btn:hover {
     transform: scale(1.1);
-    color: var(--primary); /* Добавляем эффект при наведении */
-    background-color: rgba(255, 255, 255, 0.1); /* Легкий фон при наведении */
+    color: var(--primary);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .control-btn.active {
     color: var(--secondary);
 }
 
-/* Отступы для счетчиков */
 .control-count {
-    font-size: 0.75rem; /* Немного уменьшаем размер текста счетчика */
+    font-size: 0.75rem;
     font-weight: 600;
-    position: absolute; /* Позиционируем счетчик */
-    bottom: 5px; /* Отступ снизу */
+    position: absolute;
+    bottom: 5px;
     left: 50%;
-    transform: translateX(-50%); /* Центрируем */
-    background-color: rgba(0, 0, 0, 0.5); /* Фон для счетчика */
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
     padding: 2px 6px;
     border-radius: 10px;
-    white-space: nowrap; /* Предотвращаем перенос строки */
+    white-space: nowrap;
 }
 
 /* Модальные окна */
@@ -273,7 +255,7 @@ body {
     max-height: 80vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); /* Улучшенная тень для модалки */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
 }
 
 .modal-header {
@@ -297,70 +279,7 @@ body {
     color: var(--secondary);
 }
 
-/* Формы авторизации */
-.auth-forms {
-    padding: 20px;
-}
-
-.auth-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.input-group {
-    width: 100%;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 10px;
-    background-color: var(--dark);
-    color: var(--light);
-    font-size: 1rem;
-    outline: none;
-    transition: all 0.3s;
-}
-
-.input-group input:focus {
-    box-shadow: 0 0 0 2px var(--primary);
-}
-
-.btn-primary {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(to right, var(--primary), var(--secondary));
-    color: var(--light);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.auth-switch {
-    color: var(--gray);
-    text-align: center;
-}
-
-.auth-switch span {
-    color: var(--secondary);
-    cursor: pointer;
-    font-weight: 600;
-    transition: color 0.3s;
-}
-
-.auth-switch span:hover {
-    color: var(--primary);
-}
+/* Убраны стили для форм авторизации */
 
 /* Комментарии */
 .comments-list {
@@ -374,7 +293,7 @@ body {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
-    background-color: var(--dark); /* Фон для каждого комментария */
+    background-color: var(--dark);
     padding: 10px;
     border-radius: 10px;
 }
@@ -399,7 +318,7 @@ body {
 .comment-author {
     font-weight: 600;
     margin-bottom: 5px;
-    color: var(--primary); /* Цвет имени автора */
+    color: var(--primary);
 }
 
 .comment-text {
@@ -429,6 +348,29 @@ body {
     box-shadow: 0 0 0 2px var(--secondary);
 }
 
+.btn-primary {
+    padding: 12px 15px; /* Изменено для кнопки отправки комментария */
+    border: none;
+    border-radius: 20px; /* Изменено для кнопки отправки комментария */
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: var(--light);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* Профиль пользователя */
 .profile-content {
     padding: 20px;
@@ -452,13 +394,13 @@ body {
     gap: 10px;
     max-height: 250px;
     overflow-y: auto;
-    padding-right: 5px; /* Для скроллбара */
+    padding-right: 5px;
 }
 
 .saved-video-item {
     position: relative;
     width: 100%;
-    padding-top: 75%; /* 4:3 aspect ratio */
+    padding-top: 75%;
     background-color: var(--dark);
     border-radius: 8px;
     overflow: hidden;
@@ -494,7 +436,6 @@ body {
     text-overflow: ellipsis;
 }
 
-
 /* Адаптивность */
 @media (max-width: 768px) {
     .header {
@@ -509,11 +450,11 @@ body {
     
     .video-controls {
         bottom: 15px;
-        right: 15px; /* Перемещаем вправо */
+        right: 15px;
     }
     
     .control-group {
-        padding: 12px 8px; /* Адаптируем padding */
+        padding: 12px 8px;
     }
     
     .control-btn {
@@ -522,7 +463,7 @@ body {
         font-size: 1.2rem;
     }
 
-    .control-count { /* Изменено с .control-btn span на .control-count */
+    .control-count {
         font-size: 0.7rem;
         bottom: 3px;
     }
@@ -567,7 +508,7 @@ body {
     
     .video-controls {
         bottom: 10px;
-        right: 10px; /* Перемещаем вправо */
+        right: 10px;
     }
     
     .control-group {
@@ -581,7 +522,7 @@ body {
         font-size: 1.1rem;
     }
 
-    .control-count { /* Изменено с .control-btn span на .control-count */
+    .control-count {
         font-size: 0.65rem;
         bottom: 2px;
     }

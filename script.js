@@ -1,21 +1,17 @@
 // Данные приложения
-let currentUser = null;
+let currentUser = { username: "Гость", email: "guest@example.com" }; // Пользователь по умолчанию
 let currentVideoIndex = 0;
 let videos = [];
 let comments = {};
 let likedVideos = new Set();
-let savedVideos = new Set(); // Для сохраненных видео текущего пользователя
-let isTransitioning = false; // Флаг для предотвращения множественных свайпов во время анимации
+let savedVideos = new Set();
+let isTransitioning = false;
 
 // Элементы DOM
 const mainPage = document.getElementById('mainPage');
-const authButtons = document.getElementById('authButtons');
 const userMenu = document.getElementById('userMenu');
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
 const userName = document.getElementById('userName');
 const profileBtn = document.getElementById('profileBtn');
-const logoutBtn = document.getElementById('logoutBtn');
 const videoCarousel = document.querySelector('.video-carousel');
 const likeBtn = document.getElementById('likeBtn');
 const commentBtn = document.getElementById('commentBtn');
@@ -25,26 +21,10 @@ const likeCount = document.getElementById('likeCount');
 const commentCount = document.getElementById('commentCount');
 
 // Модальные окна
-const authModal = document.getElementById('authModal');
-const authModalTitle = document.getElementById('authModalTitle');
 const commentModal = document.getElementById('commentModal');
 const profileModal = document.getElementById('profileModal');
-const closeAuthModal = document.getElementById('closeAuthModal');
 const closeCommentModal = document.getElementById('closeCommentModal');
 const closeProfileModal = document.getElementById('closeProfileModal');
-
-// Формы авторизации
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const showRegister = document.getElementById('showRegister');
-const showLogin = document.getElementById('showLogin');
-const submitLogin = document.getElementById('submitLogin');
-const submitRegister = document.getElementById('submitRegister');
-const usernameInput = document.getElementById('username');
-const passwordInput = document.getElementById('password');
-const regUsernameInput = document.getElementById('regUsername');
-const regEmailInput = document.getElementById('regEmail');
-const regPasswordInput = document.getElementById('regPassword');
 
 // Комментарии
 const commentsList = document.querySelector('.comments-list');
@@ -58,25 +38,16 @@ const savedVideosList = document.getElementById('savedVideosList');
 
 // Инициализация приложения
 document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, есть ли сохраненный пользователь
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        updateUserInterface();
-    }
-    
-    // Загружаем понравившиеся видео (глобально, или можно привязать к пользователю)
+    // Загружаем понравившиеся видео
     const savedLikes = localStorage.getItem('likedVideos');
     if (savedLikes) {
         likedVideos = new Set(JSON.parse(savedLikes));
     }
 
-    // Загружаем сохраненные видео для текущего пользователя (если он есть)
-    if (currentUser) {
-        const userSavedVideos = localStorage.getItem(`savedVideos_${currentUser.username}`);
-        if (userSavedVideos) {
-            savedVideos = new Set(JSON.parse(userSavedVideos));
-        }
+    // Загружаем сохраненные видео для текущего пользователя (Гостя)
+    const userSavedVideos = localStorage.getItem(`savedVideos_${currentUser.username}`);
+    if (userSavedVideos) {
+        savedVideos = new Set(JSON.parse(userSavedVideos));
     }
     
     // Инициализируем видео
@@ -88,9 +59,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Рендерим все видео и показываем первое
     renderVideos();
     updateVideoDisplay(currentVideoIndex);
+
+    // Обновляем имя пользователя в шапке
+    userName.textContent = currentUser.username;
 });
 
-// Инициализация видео (имитация данных с сервера)
+// Инициализация видео
 function initVideos() {
     videos = [
         {
@@ -147,22 +121,12 @@ function initVideos() {
 
 // Настройка обработчиков событий
 function setupEventListeners() {
-    // Авторизация
-    loginBtn.addEventListener('click', () => showAuthModal('login'));
-    registerBtn.addEventListener('click', () => showAuthModal('register'));
-    logoutBtn.addEventListener('click', handleLogout);
+    // Профиль
     profileBtn.addEventListener('click', showProfileModal);
     
     // Модальные окна
-    closeAuthModal.addEventListener('click', hideAuthModal);
     closeCommentModal.addEventListener('click', hideComments);
     closeProfileModal.addEventListener('click', hideProfileModal);
-    
-    // Формы авторизации
-    showRegister.addEventListener('click', () => switchAuthForm('register'));
-    showLogin.addEventListener('click', () => switchAuthForm('login'));
-    submitLogin.addEventListener('click', handleLogin);
-    submitRegister.addEventListener('click', handleRegister);
     
     // Управление видео
     likeBtn.addEventListener('click', toggleLike);
@@ -182,222 +146,203 @@ function setupEventListeners() {
     setupVideoNavigation();
 }
 
-// Обновление интерфейса пользователя (кнопки авторизации/меню пользователя)
-function updateUserInterface() {
-    if (currentUser) {
-        authButtons.classList.add('hidden');
-        userMenu.classList.remove('hidden');
-        userName.textContent = currentUser.username;
-        // Загружаем сохраненные видео для текущего пользователя
-        const userSavedVideos = localStorage.getItem(`savedVideos_${currentUser.username}`);
-        if (userSavedVideos) {
-            savedVideos = new Set(JSON.parse(userSavedVideos));
-        } else {
-            savedVideos = new Set(); // Если нет сохраненных, инициализируем пустой Set
-        }
+// Показать уведомление
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.padding = '15px 20px';
+    notification.style.borderRadius = '5px';
+    notification.style.color = 'white';
+    notification.style.zIndex = '10000';
+    notification.style.fontWeight = '600';
+    notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+    notification.style.transform = 'translateX(150%)';
+    notification.style.transition = 'transform 0.3s ease';
+    
+    if (type === 'success') {
+        notification.style.background = 'linear-gradient(to right, var(--success), #66BB6A)';
+    } else if (type === 'error') {
+        notification.style.background = 'linear-gradient(to right, var(--error), #EF5350)';
     } else {
-        authButtons.classList.remove('hidden');
-        userMenu.classList.add('hidden');
-        savedVideos = new Set(); // Очищаем сохраненные видео при выходе
+        notification.style.background = 'linear-gradient(to right, var(--primary), var(--secondary))';
     }
-    // Обновляем состояние кнопки сохранения для текущего видео
-    if (videos.length > 0) { // Проверяем, что видео загружены
-        updateSaveButtonState(videos[currentVideoIndex].id);
-    }
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(150%)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
 }
 
-// Показать модальное окно авторизации
-function showAuthModal(formType) {
-    authModal.classList.add('active');
-    switchAuthForm(formType);
-    authModalTitle.textContent = formType === 'login' ? 'Войдите в аккаунт' : 'Создайте аккаунт';
-}
-
-// Скрыть модальное окно авторизации
-function hideAuthModal() {
-    authModal.classList.remove('active');
-    // Очищаем поля форм
-    usernameInput.value = '';
-    passwordInput.value = '';
-    regUsernameInput.value = '';
-    regEmailInput.value = '';
-    regPasswordInput.value = '';
-}
-
-// Переключение между формами входа и регистрации
-function switchAuthForm(formType) {
-    if (formType === 'login') {
-        loginForm.classList.add('active');
-        loginForm.classList.remove('hidden');
-        registerForm.classList.add('hidden');
-        registerForm.classList.remove('active');
-        authModalTitle.textContent = 'Войдите в аккаунт';
-    } else {
-        registerForm.classList.add('active');
-        registerForm.classList.remove('hidden');
-        loginForm.classList.add('hidden');
-        loginForm.classList.remove('active');
-        authModalTitle.textContent = 'Создайте аккаунт';
-    }
-}
-
-// Обработка входа
-function handleLogin() {
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value.trim();
-    
-    if (!username || !password) {
-        alert('Пожалуйста, заполните все поля');
-        return;
-    }
-    
-    // Имитация проверки на сервере (используем localStorage)
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-        currentUser = user;
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        updateUserInterface();
-        hideAuthModal();
-        alert(`Добро пожаловать, ${username}!`);
-    } else {
-        alert('Неверное имя пользователя или пароль');
-    }
-}
-
-// Обработка регистрации
-function handleRegister() {
-    const username = regUsernameInput.value.trim();
-    const email = regEmailInput.value.trim();
-    const password = regPasswordInput.value.trim();
-    
-    if (!username || !email || !password) {
-        alert('Пожалуйста, заполните все поля');
-        return;
-    }
-    
-    if (password.length < 6) {
-        alert('Пароль должен содержать не менее 6 символов');
-        return;
-    }
-    
-    // Имитация регистрации на сервере (используем localStorage)
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    if (users.find(u => u.username === username)) {
-        alert('Пользователь с таким именем уже существует');
-        return;
-    }
-    
-    if (users.find(u => u.email === email)) {
-        alert('Пользователь с таким email уже существует');
-        return;
-    }
-    
-    const newUser = { username, email, password }; // savedVideos будут загружены при логине
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    currentUser = newUser;
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    
-    updateUserInterface();
-    hideAuthModal();
-    alert('Регистрация прошла успешно!');
-}
-
-// Выход из аккаунта
-function handleLogout() {
-    currentUser = null;
-    localStorage.removeItem('currentUser');
-    updateUserInterface();
-    alert('Вы вышли из аккаунта');
-}
-
-// Рендеринг всех видео в карусель
+// Рендеринг видео
 function renderVideos() {
-    videoCarousel.innerHTML = ''; // Очищаем контейнер
+    videoCarousel.innerHTML = '';
+    
     videos.forEach((video, index) => {
-        const videoElement = document.createElement('div');
-        videoElement.className = 'video-item';
-        videoElement.dataset.index = index; // Добавляем data-атрибут для индекса
-        videoElement.innerHTML = `
-            <video src="${video.videoUrl}" autoplay muted loop playsinline></video>
+        const videoItem = document.createElement('div');
+        videoItem.className = `video-item ${index === currentVideoIndex ? 'active' : ''}`;
+        videoItem.dataset.index = index;
+        
+        videoItem.innerHTML = `
+            <video loop muted>
+                <source src="${video.videoUrl}" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
             <div class="video-info">
-                <div class="video-title">${video.title}</div>
+                <h3 class="video-title">${video.title}</h3>
                 <div class="video-author">
                     <div class="author-avatar">${video.author.charAt(0)}</div>
                     <span>${video.author}</span>
                 </div>
             </div>
         `;
-        videoCarousel.appendChild(videoElement);
+        
+        videoCarousel.appendChild(videoItem);
     });
 }
 
-// Обновление отображения видео (активное, предыдущее, следующее)
-function updateVideoDisplay(newIndex) {
-    // Проверяем границы индекса
-    if (newIndex < 0) {
-        newIndex = videos.length - 1; // Переход с первого на последнее
-    } else if (newIndex >= videos.length) {
-        newIndex = 0; // Переход с последнего на первое
-    }
-
-    if (isTransitioning || newIndex === currentVideoIndex) return;
-
+// Обновление отображения видео
+function updateVideoDisplay(index) {
+    if (isTransitioning || index < 0 || index >= videos.length) return;
+    
     isTransitioning = true;
-
-    const currentVideoElement = videoCarousel.querySelector(`.video-item.active`);
-    const newVideoElement = videoCarousel.querySelector(`.video-item[data-index="${newIndex}"]`);
-
-    if (!newVideoElement) {
-        isTransitioning = false;
-        return;
-    }
-
-    // Определяем направление свайпа для классов анимации
-    const direction = (newIndex > currentVideoIndex || (currentVideoIndex === videos.length - 1 && newIndex === 0)) && !(currentVideoIndex === 0 && newIndex === videos.length - 1) ? 'next' : 'prev';
-
+    
+    // Останавливаем текущее видео
+    const currentVideoElement = document.querySelector('.video-item.active video');
     if (currentVideoElement) {
-        currentVideoElement.classList.remove('active');
-        currentVideoElement.classList.add(direction === 'next' ? 'prev' : 'next'); // Старое видео уходит в противоположную сторону
+        currentVideoElement.pause();
+    }
+    
+    // Обновляем классы для анимации
+    document.querySelectorAll('.video-item').forEach((item, i) => {
+        item.classList.remove('active', 'prev', 'next');
         
-        // Останавливаем старое видео
-        const oldVideoPlayer = currentVideoElement.querySelector('video');
-        if (oldVideoPlayer) {
-            oldVideoPlayer.pause();
-            oldVideoPlayer.currentTime = 0;
+        if (i === index) {
+            item.classList.add('active');
+        } else if (i < index) {
+            item.classList.add('prev');
+        } else {
+            item.classList.add('next');
         }
+    });
+    
+    // Обновляем счетчики лайков и комментариев
+    const video = videos[index];
+    likeCount.textContent = formatCount(video.likes + (likedVideos.has(video.id) ? 1 : 0));
+    commentCount.textContent = formatCount(video.comments + (comments[video.id] ? comments[video.id].length : 0));
+    
+    // Обновляем состояние кнопки лайка
+    if (likedVideos.has(video.id)) {
+        likeBtn.classList.add('active');
+        likeBtn.innerHTML = '<i class="fas fa-heart"></i><span class="control-count" id="likeCount">' + formatCount(video.likes + 1) + '</span>';
+    } else {
+        likeBtn.classList.remove('active');
+        likeBtn.innerHTML = '<i class="far fa-heart"></i><span class="control-count" id="likeCount">' + formatCount(video.likes) + '</span>';
     }
-
-    newVideoElement.classList.remove('prev', 'next'); // Убираем классы, если они были
-    newVideoElement.classList.add('active');
-
-    // Запускаем новое видео
-    const newVideoPlayer = newVideoElement.querySelector('video');
-    if (newVideoPlayer) {
-        newVideoPlayer.play().catch(error => console.log("Autoplay prevented:", error));
-    }
-
-    currentVideoIndex = newIndex;
-
-    // Обновляем счетчики и состояние кнопок для нового видео
-    const video = videos[currentVideoIndex];
-    likeCount.textContent = formatCount(video.likes);
-    commentCount.textContent = formatCount(video.comments);
-    updateLikeButtonState(video.id);
+    
+    // Обновляем состояние кнопки сохранения
     updateSaveButtonState(video.id);
-
-    // После завершения анимации сбрасываем флаг
-    newVideoElement.addEventListener('transitionend', () => {
+    
+    // Воспроизводим новое видео после небольшой задержки
+    setTimeout(() => {
+        const newVideoElement = document.querySelector('.video-item.active video');
+        if (newVideoElement) {
+            newVideoElement.play().catch(e => console.log('Автовоспроизведение заблокировано:', e));
+        }
         isTransitioning = false;
-        // Удаляем классы prev/next со всех неактивных видео, чтобы они были готовы к следующей анимации
-        videoCarousel.querySelectorAll('.video-item:not(.active)').forEach(item => {
-            item.classList.remove('prev', 'next');
-        });
-    }, { once: true });
+    }, 300);
+    
+    currentVideoIndex = index;
+}
+
+// Обновление состояния кнопки сохранения
+function updateSaveButtonState(videoId) {
+    if (savedVideos.has(videoId)) {
+        saveBtn.classList.add('active');
+        saveBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+    } else {
+        saveBtn.classList.remove('active');
+        saveBtn.innerHTML = '<i class="far fa-bookmark"></i>';
+    }
+}
+
+// Форматирование счетчиков
+function formatCount(count) {
+    if (count >= 1000000) {
+        return (count / 1000000).toFixed(1) + 'M';
+    } else if (count >= 1000) {
+        return (count / 1000).toFixed(1) + 'K';
+    }
+    return count.toString();
+}
+
+// Настройка навигации по видео
+function setupVideoNavigation() {
+    let startY = 0;
+    let isScrolling = false;
+    
+    // Обработка свайпов на мобильных устройствах
+    document.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+        isScrolling = false;
+    });
+    
+    document.addEventListener('touchmove', (e) => {
+        if (!isScrolling) {
+            const currentY = e.touches[0].clientY;
+            const diffY = startY - currentY;
+            
+            if (Math.abs(diffY) > 50) {
+                isScrolling = true;
+                
+                if (diffY > 0 && currentVideoIndex < videos.length - 1) {
+                    // Свайп вверх - следующее видео
+                    updateVideoDisplay(currentVideoIndex + 1);
+                } else if (diffY < 0 && currentVideoIndex > 0) {
+                    // Свайп вниз - предыдущее видео
+                    updateVideoDisplay(currentVideoIndex - 1);
+                }
+            }
+        }
+    });
+    
+    // Обработка колесика мыши на десктопе
+    document.addEventListener('wheel', (e) => {
+        if (isTransitioning) return;
+        
+        if (e.deltaY > 50 && currentVideoIndex < videos.length - 1) {
+            // Прокрутка вниз - следующее видео
+            updateVideoDisplay(currentVideoIndex + 1);
+        } else if (e.deltaY < -50 && currentVideoIndex > 0) {
+            // Прокрутка вверх - предыдущее видео
+            updateVideoDisplay(currentVideoIndex - 1);
+        }
+    });
+    
+    // Обработка клавиш стрелок на клавиатуре
+    document.addEventListener('keydown', (e) => {
+        if (isTransitioning) return;
+        
+        if (e.key === 'ArrowDown' && currentVideoIndex < videos.length - 1) {
+            updateVideoDisplay(currentVideoIndex + 1);
+        } else if (e.key === 'ArrowUp' && currentVideoIndex > 0) {
+            updateVideoDisplay(currentVideoIndex - 1);
+        }
+    });
 }
 
 // Переключение лайка
@@ -405,86 +350,45 @@ function toggleLike() {
     const video = videos[currentVideoIndex];
     
     if (likedVideos.has(video.id)) {
-        // Убираем лайк
-        video.likes--;
         likedVideos.delete(video.id);
+        likeBtn.classList.remove('active');
+        likeBtn.innerHTML = '<i class="far fa-heart"></i><span class="control-count" id="likeCount">' + formatCount(video.likes) + '</span>';
     } else {
-        // Ставим лайк
-        video.likes++;
         likedVideos.add(video.id);
+        likeBtn.classList.add('active');
+        likeBtn.innerHTML = '<i class="fas fa-heart"></i><span class="control-count" id="likeCount">' + formatCount(video.likes + 1) + '</span>';
     }
-    
-    likeCount.textContent = formatCount(video.likes);
-    updateLikeButtonState(video.id);
     
     // Сохраняем лайки в localStorage
     localStorage.setItem('likedVideos', JSON.stringify([...likedVideos]));
 }
 
-// Обновление состояния кнопки лайка
-function updateLikeButtonState(videoId) {
-    if (likedVideos.has(videoId)) {
-        likeBtn.classList.add('active');
-        likeBtn.querySelector('i').className = 'fas fa-heart'; // Заполненное сердце
-    } else {
-        likeBtn.classList.remove('active');
-        likeBtn.querySelector('i').className = 'far fa-heart'; // Пустое сердце
-    }
-}
-
 // Переключение сохранения видео
 function toggleSaveVideo() {
-    if (!currentUser) {
-        alert('Чтобы сохранить видео, войдите в аккаунт');
-        showAuthModal('login');
-        return;
-    }
-
     const video = videos[currentVideoIndex];
+    
     if (savedVideos.has(video.id)) {
-        // Удаляем из сохраненных
         savedVideos.delete(video.id);
+        saveBtn.classList.remove('active');
+        saveBtn.innerHTML = '<i class="far fa-bookmark"></i>';
+        showNotification('Видео удалено из сохраненных', 'info');
     } else {
-        // Добавляем в сохраненные
         savedVideos.add(video.id);
+        saveBtn.classList.add('active');
+        saveBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+        showNotification('Видео добавлено в сохраненные', 'success');
     }
     
-    updateSaveButtonState(video.id);
-    // Сохраняем список сохраненных видео для текущего пользователя
+    // Сохраняем сохраненные видео для текущего пользователя
     localStorage.setItem(`savedVideos_${currentUser.username}`, JSON.stringify([...savedVideos]));
-}
-
-// Обновление состояния кнопки сохранения
-function updateSaveButtonState(videoId) {
-    if (currentUser && savedVideos.has(videoId)) {
-        saveBtn.classList.add('active');
-        saveBtn.querySelector('i').className = 'fas fa-bookmark'; // Заполненная закладка
-    } else {
-        saveBtn.classList.remove('active');
-        saveBtn.querySelector('i').className = 'far fa-bookmark'; // Пустая закладка
-    }
 }
 
 // Показать комментарии
 function showComments() {
     const video = videos[currentVideoIndex];
-    commentsList.innerHTML = '';
-    
-    // Добавляем комментарии
-    comments[video.id].forEach(comment => {
-        const commentElement = document.createElement('div');
-        commentElement.className = 'comment-item';
-        commentElement.innerHTML = `
-            <div class="comment-avatar">${comment.user.charAt(0).toUpperCase()}</div>
-            <div class="comment-content">
-                <div class="comment-author">${comment.user}</div>
-                <div class="comment-text">${comment.text}</div>
-            </div>
-        `;
-        commentsList.appendChild(commentElement);
-    });
-    
+    renderComments(video.id);
     commentModal.classList.add('active');
+    commentText.focus();
 }
 
 // Скрыть комментарии
@@ -493,40 +397,59 @@ function hideComments() {
     commentText.value = '';
 }
 
-// Добавить комментарий
-function addComment() {
-    if (!currentUser) {
-        alert('Чтобы оставить комментарий, войдите в аккаунт');
-        hideComments();
-        showAuthModal('login');
+// Рендеринг комментариев
+function renderComments(videoId) {
+    commentsList.innerHTML = '';
+    
+    if (!comments[videoId] || comments[videoId].length === 0) {
+        commentsList.innerHTML = '<p style="text-align: center; color: var(--gray);">Пока нет комментариев. Будьте первым!</p>';
         return;
     }
     
+    comments[videoId].forEach(comment => {
+        const commentItem = document.createElement('div');
+        commentItem.className = 'comment-item';
+        
+        commentItem.innerHTML = `
+            <div class="comment-avatar">${comment.user.charAt(0)}</div>
+            <div class="comment-content">
+                <div class="comment-author">${comment.user}</div>
+                <div class="comment-text">${comment.text}</div>
+            </div>
+        `;
+        
+        commentsList.appendChild(commentItem);
+    });
+}
+
+// Добавление комментария
+function addComment() {
     const text = commentText.value.trim();
-    if (!text) return;
+    
+    if (!text) {
+        alert('Пожалуйста, введите текст комментария');
+        return;
+    }
     
     const video = videos[currentVideoIndex];
+    
+    if (!comments[video.id]) {
+        comments[video.id] = [];
+    }
+    
     comments[video.id].push({
         user: currentUser.username,
         text: text
     });
     
-    video.comments++;
-    commentCount.textContent = formatCount(video.comments);
+    // Обновляем счетчик комментариев
+    commentCount.textContent = formatCount(video.comments + comments[video.id].length);
     
-    // Добавляем новый комментарий в список
-    const commentElement = document.createElement('div');
-    commentElement.className = 'comment-item';
-    commentElement.innerHTML = `
-        <div class="comment-avatar">${currentUser.username.charAt(0).toUpperCase()}</div>
-        <div class="comment-content">
-            <div class="comment-author">${currentUser.username}</div>
-            <div class="comment-text">${text}</div>
-        </div>
-    `;
-    commentsList.appendChild(commentElement);
-    
+    // Очищаем поле ввода
     commentText.value = '';
+    
+    // Перерисовываем комментарии
+    renderComments(video.id);
     
     // Прокручиваем к новому комментарию
     commentsList.scrollTop = commentsList.scrollHeight;
@@ -534,34 +457,33 @@ function addComment() {
 
 // Поделиться видео
 function shareVideo() {
+    const video = videos[currentVideoIndex];
+    
     if (navigator.share) {
         navigator.share({
-            title: videos[currentVideoIndex].title,
-            text: 'Посмотри это видео в ТочкаСхода!',
-            url: window.location.href // Можно заменить на конкретную ссылку на видео
+            title: video.title,
+            text: 'Посмотрите это видео: ' + video.title,
+            url: window.location.href
         })
-        .catch(error => console.log('Ошибка при попытке поделиться:', error));
+        .catch(err => console.log('Ошибка при попытке поделиться:', err));
     } else {
         // Fallback для браузеров, которые не поддерживают Web Share API
-        alert('Функция "Поделиться" доступна в современных браузерах и мобильных приложениях');
-        // Можно предложить скопировать ссылку вручную
-        const videoLink = window.location.href; // Или сгенерировать ссылку на текущее видео
-        navigator.clipboard.writeText(videoLink)
-            .then(() => alert('Ссылка на видео скопирована в буфер обмена!'))
-            .catch(err => console.error('Не удалось скопировать ссылку:', err));
+        navigator.clipboard.writeText(window.location.href)
+            .then(() => {
+                showNotification('Ссылка скопирована в буфер обмена!', 'success');
+            })
+            .catch(err => {
+                console.log('Ошибка при копировании ссылки:', err);
+                showNotification('Не удалось скопировать ссылку', 'error');
+            });
     }
 }
 
 // Показать модальное окно профиля
 function showProfileModal() {
-    if (!currentUser) {
-        alert('Войдите в аккаунт, чтобы просмотреть профиль');
-        showAuthModal('login');
-        return;
-    }
-
     profileUsername.textContent = currentUser.username;
     profileEmail.textContent = currentUser.email;
+    
     renderSavedVideos();
     profileModal.classList.add('active');
 }
@@ -571,115 +493,37 @@ function hideProfileModal() {
     profileModal.classList.remove('active');
 }
 
-// Рендеринг сохраненных видео в профиле
+// Рендеринг сохраненных видео
 function renderSavedVideos() {
     savedVideosList.innerHTML = '';
+    
     if (savedVideos.size === 0) {
-        savedVideosList.innerHTML = '<p style="color: var(--gray); text-align: center;">У вас пока нет сохраненных видео.</p>';
+        savedVideosList.innerHTML = '<p style="text-align: center; color: var(--gray);">У вас нет сохраненных видео</p>';
         return;
     }
-
+    
     savedVideos.forEach(videoId => {
         const video = videos.find(v => v.id === videoId);
         if (video) {
-            const savedVideoElement = document.createElement('div');
-            savedVideoElement.className = 'saved-video-item';
-            savedVideoElement.dataset.videoId = video.id;
-            savedVideoElement.innerHTML = `
-                <video src="${video.videoUrl}" muted></video>
+            const videoItem = document.createElement('div');
+            videoItem.className = 'saved-video-item';
+            videoItem.innerHTML = `
+                <video muted>
+                    <source src="${video.videoUrl}" type="video/mp4">
+                </video>
                 <div class="video-title-overlay">${video.title}</div>
             `;
-            savedVideoElement.addEventListener('click', () => {
-                // При клике на сохраненное видео, переключаемся на него в карусели
-                const index = videos.findIndex(v => v.id === video.id);
+            
+            videoItem.addEventListener('click', () => {
+                // Находим индекс видео и переключаемся на него
+                const index = videos.findIndex(v => v.id === videoId);
                 if (index !== -1) {
-                    hideProfileModal();
                     updateVideoDisplay(index);
+                    hideProfileModal();
                 }
             });
-            savedVideosList.appendChild(savedVideoElement);
-        }
-    });
-}
-
-
-// Настройка жестов свайпа и прокрутки колесиком мыши
-function setupVideoNavigation() {
-    let startY = 0;
-    let isSwiping = false;
-    let swipeThreshold = 50; // Минимальное расстояние свайпа для переключения
-
-    videoCarousel.addEventListener('touchstart', e => {
-        if (isTransitioning) return;
-        startY = e.touches[0].clientY;
-        isSwiping = true;
-    });
-    
-    videoCarousel.addEventListener('touchmove', e => {
-        if (!isSwiping || isTransitioning) return;
-        
-        const currentY = e.touches[0].clientY;
-        const diffY = startY - currentY;
-        
-        // Предотвращаем стандартную прокрутку, если свайп достаточно большой
-        if (Math.abs(diffY) > 10) { // Небольшой порог для начала предотвращения прокрутки
-            e.preventDefault(); 
-        }
-
-        // Если свайп достаточно большой по вертикали
-        if (Math.abs(diffY) > swipeThreshold) {
-            if (diffY > 0) {
-                // Свайп вверх - следующее видео
-                updateVideoDisplay(currentVideoIndex + 1);
-            } else {
-                // Свайп вниз - предыдущее видео
-                updateVideoDisplay(currentVideoIndex - 1);
-            }
             
-            isSwiping = false; // Сбросить флаг после обработки свайпа
-        }
-    }, { passive: false }); // passive: false для предотвращения стандартной прокрутки
-    
-    videoCarousel.addEventListener('touchend', () => {
-        isSwiping = false;
-    });
-    
-    // Обработка колесика мыши для десктопных устройств
-    videoCarousel.addEventListener('wheel', e => {
-        if (isTransitioning) {
-            e.preventDefault(); // Предотвращаем прокрутку, если идет анимация
-            return;
-        }
-
-        e.preventDefault(); // Предотвращаем стандартную прокрутку страницы
-
-        if (e.deltaY > 0) {
-            // Прокрутка вниз - следующее видео
-            updateVideoDisplay(currentVideoIndex + 1);
-        } else {
-            // Прокрутка вверх - предыдущее видео
-            updateVideoDisplay(currentVideoIndex - 1);
-        }
-    }, { passive: false }); // passive: false для предотвращения стандартной прокрутки
-    
-    // Обработка клавиш для десктопных устройств
-    document.addEventListener('keydown', e => {
-        if (isTransitioning) return;
-
-        if (e.key === 'ArrowUp') {
-            updateVideoDisplay(currentVideoIndex - 1);
-        } else if (e.key === 'ArrowDown') {
-            updateVideoDisplay(currentVideoIndex + 1);
+            savedVideosList.appendChild(videoItem);
         }
     });
-}
-
-// Форматирование чисел (1K, 1M и т.д.)
-function formatCount(count) {
-    if (count >= 1000000) {
-        return (count / 1000000).toFixed(1) + 'M';
-    } else if (count >= 1000) {
-        return (count / 1000).toFixed(1) + 'K';
-    }
-    return count.toString();
 }
