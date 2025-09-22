@@ -4,6 +4,7 @@ let currentVideoIndex = 0;
 let videos = [];
 let comments = {};
 let likedVideos = new Set();
+let isTransitioning = false; // Флаг для предотвращения множественных свайпов во время анимации
 
 // Элементы DOM
 const mainPage = document.getElementById('mainPage');
@@ -13,7 +14,7 @@ const loginBtn = document.getElementById('loginBtn');
 const registerBtn = document.getElementById('registerBtn');
 const userName = document.getElementById('userName');
 const logoutBtn = document.getElementById('logoutBtn');
-const videoContainer = document.querySelector('.video-container');
+const videoCarousel = document.querySelector('.video-carousel'); // Изменено на video-carousel
 const likeBtn = document.getElementById('likeBtn');
 const commentBtn = document.getElementById('commentBtn');
 const shareBtn = document.getElementById('shareBtn');
@@ -66,7 +67,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     
     // Загружаем первое видео
-    loadVideo(currentVideoIndex);
+    renderVideos(); // Рендерим все видео сразу
+    updateVideoDisplay(currentVideoIndex); // Показываем первое видео
 });
 
 // Инициализация видео
@@ -155,8 +157,8 @@ function setupEventListeners() {
         }
     });
     
-    // Свайпы для мобильных устройств
-    setupSwipeGestures();
+    // Свайпы для мобильных устройств и прокрутка для десктопа
+    setupVideoNavigation();
 }
 
 // Обновление интерфейса пользователя
@@ -277,44 +279,81 @@ function handleLogout() {
     alert('Вы вышли из аккаунта');
 }
 
-// Загрузка видео
-function loadVideo(index) {
-    if (index < 0 || index >= videos.length) return;
-    
-    currentVideoIndex = index;
-    const video = videos[index];
-    
-    // Очищаем контейнер
-    videoContainer.innerHTML = '';
-    
-    // Создаем элемент видео
-    const videoElement = document.createElement('div');
-    videoElement.className = 'video-item';
-    videoElement.innerHTML = `
-        <video src="${video.videoUrl}" autoplay muted loop></video>
-        <div class="video-info">
-            <div class="video-title">${video.title}</div>
-            <div class="video-author">
-                <div class="author-avatar">${video.author.charAt(0)}</div>
-                <span>${video.author}</span>
+// Рендеринг всех видео в карусель
+function renderVideos() {
+    videoCarousel.innerHTML = ''; // Очищаем контейнер
+    videos.forEach((video, index) => {
+        const videoElement = document.createElement('div');
+        videoElement.className = 'video-item';
+        videoElement.dataset.index = index; // Добавляем data-атрибут для индекса
+        videoElement.innerHTML = `
+            <video src="${video.videoUrl}" autoplay muted loop playsinline></video>
+            <div class="video-info">
+                <div class="video-title">${video.title}</div>
+                <div class="video-author">
+                    <div class="author-avatar">${video.author.charAt(0)}</div>
+                    <span>${video.author}</span>
+                </div>
             </div>
-        </div>
-    `;
-    
-    videoContainer.appendChild(videoElement);
-    
-    // Обновляем счетчики
+        `;
+        videoCarousel.appendChild(videoElement);
+    });
+}
+
+// Обновление отображения видео (активное, предыдущее, следующее)
+function updateVideoDisplay(newIndex) {
+    if (isTransitioning || newIndex < 0 || newIndex >= videos.length) return;
+
+    isTransitioning = true;
+
+    const currentVideoElement = videoCarousel.querySelector(`.video-item.active`);
+    const newVideoElement = videoCarousel.querySelector(`.video-item[data-index="${newIndex}"]`);
+
+    if (!newVideoElement) {
+        isTransitioning = false;
+        return;
+    }
+
+    // Определяем направление свайпа для классов анимации
+    const direction = newIndex > currentVideoIndex ? 'next' : 'prev';
+
+    if (currentVideoElement) {
+        currentVideoElement.classList.remove('active');
+        currentVideoElement.classList.add(direction === 'next' ? 'prev' : 'next'); // Старое видео уходит в противоположную сторону
+        
+        // Останавливаем старое видео
+        const oldVideoPlayer = currentVideoElement.querySelector('video');
+        if (oldVideoPlayer) {
+            oldVideoPlayer.pause();
+            oldVideoPlayer.currentTime = 0;
+        }
+    }
+
+    newVideoElement.classList.remove('prev', 'next'); // Убираем классы, если они были
+    newVideoElement.classList.add('active');
+
+    // Запускаем новое видео
+    const newVideoPlayer = newVideoElement.querySelector('video');
+    if (newVideoPlayer) {
+        newVideoPlayer.play().catch(error => console.log("Autoplay prevented:", error));
+    }
+
+    currentVideoIndex = newIndex;
+
+    // Обновляем счетчики и состояние кнопки лайка для нового видео
+    const video = videos[currentVideoIndex];
     likeCount.textContent = formatCount(video.likes);
     commentCount.textContent = formatCount(video.comments);
-    
-    // Обновляем состояние кнопки лайка
-    if (likedVideos.has(video.id)) {
-        likeBtn.classList.add('active');
-        likeBtn.innerHTML = '<i class="fas fa-heart"></i><span>' + formatCount(video.likes) + '</span>';
-    } else {
-        likeBtn.classList.remove('active');
-        likeBtn.innerHTML = '<i class="far fa-heart"></i><span>' + formatCount(video.likes) + '</span>';
-    }
+    updateLikeButtonState(video.id);
+
+    // После завершения анимации сбрасываем флаг
+    newVideoElement.addEventListener('transitionend', () => {
+        isTransitioning = false;
+        // Удаляем классы prev/next со всех неактивных видео, чтобы они были готовы к следующей анимации
+        videoCarousel.querySelectorAll('.video-item:not(.active)').forEach(item => {
+            item.classList.remove('prev', 'next');
+        });
+    }, { once: true });
 }
 
 // Переключение лайка
@@ -325,20 +364,28 @@ function toggleLike() {
         // Убираем лайк
         video.likes--;
         likedVideos.delete(video.id);
-        likeBtn.classList.remove('active');
-        likeBtn.innerHTML = '<i class="far fa-heart"></i><span>' + formatCount(video.likes) + '</span>';
     } else {
         // Ставим лайк
         video.likes++;
         likedVideos.add(video.id);
-        likeBtn.classList.add('active');
-        likeBtn.innerHTML = '<i class="fas fa-heart"></i><span>' + formatCount(video.likes) + '</span>';
     }
     
     likeCount.textContent = formatCount(video.likes);
+    updateLikeButtonState(video.id);
     
     // Сохраняем лайки в localStorage
     localStorage.setItem('likedVideos', JSON.stringify([...likedVideos]));
+}
+
+// Обновление состояния кнопки лайка
+function updateLikeButtonState(videoId) {
+    if (likedVideos.has(videoId)) {
+        likeBtn.classList.add('active');
+        likeBtn.innerHTML = '<i class="fas fa-heart"></i><span>' + likeCount.textContent + '</span>';
+    } else {
+        likeBtn.classList.remove('active');
+        likeBtn.innerHTML = '<i class="far fa-heart"></i><span>' + likeCount.textContent + '</span>';
+    }
 }
 
 // Показать комментарии
@@ -423,18 +470,18 @@ function shareVideo() {
     }
 }
 
-// Настройка жестов свайпа
-function setupSwipeGestures() {
+// Настройка жестов свайпа и прокрутки колесиком мыши
+function setupVideoNavigation() {
     let startY = 0;
     let isSwiping = false;
     
-    videoContainer.addEventListener('touchstart', e => {
+    videoCarousel.addEventListener('touchstart', e => {
         startY = e.touches[0].clientY;
         isSwiping = true;
     });
     
-    videoContainer.addEventListener('touchmove', e => {
-        if (!isSwiping) return;
+    videoCarousel.addEventListener('touchmove', e => {
+        if (!isSwiping || isTransitioning) return;
         
         const currentY = e.touches[0].clientY;
         const diffY = startY - currentY;
@@ -443,26 +490,46 @@ function setupSwipeGestures() {
         if (Math.abs(diffY) > 50) {
             if (diffY > 0) {
                 // Свайп вверх - следующее видео
-                loadVideo((currentVideoIndex + 1) % videos.length);
+                updateVideoDisplay((currentVideoIndex + 1) % videos.length);
             } else {
                 // Свайп вниз - предыдущее видео
-                loadVideo((currentVideoIndex - 1 + videos.length) % videos.length);
+                updateVideoDisplay((currentVideoIndex - 1 + videos.length) % videos.length);
             }
             
             isSwiping = false;
         }
     });
     
-    videoContainer.addEventListener('touchend', () => {
+    videoCarousel.addEventListener('touchend', () => {
         isSwiping = false;
     });
     
+    // Обработка колесика мыши для десктопных устройств
+    videoCarousel.addEventListener('wheel', e => {
+        if (isTransitioning) {
+            e.preventDefault(); // Предотвращаем прокрутку, если идет анимация
+            return;
+        }
+
+        e.preventDefault(); // Предотвращаем стандартную прокрутку страницы
+
+        if (e.deltaY > 0) {
+            // Прокрутка вниз - следующее видео
+            updateVideoDisplay((currentVideoIndex + 1) % videos.length);
+        } else {
+            // Прокрутка вверх - предыдущее видео
+            updateVideoDisplay((currentVideoIndex - 1 + videos.length) % videos.length);
+        }
+    }, { passive: false }); // passive: false для предотвращения стандартной прокрутки
+    
     // Обработка клавиш для десктопных устройств
     document.addEventListener('keydown', e => {
+        if (isTransitioning) return;
+
         if (e.key === 'ArrowUp') {
-            loadVideo((currentVideoIndex - 1 + videos.length) % videos.length);
+            updateVideoDisplay((currentVideoIndex - 1 + videos.length) % videos.length);
         } else if (e.key === 'ArrowDown') {
-            loadVideo((currentVideoIndex + 1) % videos.length);
+            updateVideoDisplay((currentVideoIndex + 1) % videos.length);
         }
     });
 }

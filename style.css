@@ -19,7 +19,7 @@
 body {
     background-color: var(--dark);
     color: var(--light);
-    overflow: hidden;
+    overflow: hidden; /* Убираем прокрутку, так как видео будут переключаться */
     height: 100vh;
 }
 
@@ -29,6 +29,7 @@ body {
     height: 100vh;
     position: relative;
     background-color: #000;
+    overflow: hidden; /* Важно для плавного переключения видео */
 }
 
 .header {
@@ -95,11 +96,12 @@ body {
     display: none !important;
 }
 
-.video-container {
+/* Контейнер для всех видео, чтобы обеспечить плавное переключение */
+.video-carousel {
     width: 100%;
     height: 100vh;
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Скрывает видео, которые не в фокусе */
 }
 
 .video-item {
@@ -112,13 +114,26 @@ body {
     justify-content: center;
     align-items: center;
     background-color: #000;
-    transition: transform 0.5s ease;
+    transition: transform 0.5s ease-in-out; /* Плавный переход при смене видео */
+    transform: translateY(100%); /* Скрываем видео по умолчанию */
+}
+
+.video-item.active {
+    transform: translateY(0); /* Активное видео на экране */
+}
+
+.video-item.prev {
+    transform: translateY(-100%); /* Предыдущее видео уходит вверх */
+}
+
+.video-item.next {
+    transform: translateY(100%); /* Следующее видео приходит снизу */
 }
 
 .video-item video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* Видео заполняет весь контейнер */
 }
 
 .video-info {
@@ -128,6 +143,7 @@ body {
     right: 20px;
     color: white;
     z-index: 2;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* Улучшаем читаемость текста */
 }
 
 .video-title {
@@ -151,24 +167,26 @@ body {
     justify-content: center;
     align-items: center;
     font-weight: bold;
+    flex-shrink: 0; /* Предотвращаем сжатие аватара */
 }
 
+/* Элементы управления видео теперь слева */
 .video-controls {
     position: fixed;
-    bottom: 20px;
-    left: 0;
-    right: 0;
+    bottom: 20px; /* Отступ снизу */
+    left: 20px; /* Отступ слева */
     display: flex;
-    justify-content: center;
-    padding: 0 20px;
+    flex-direction: column; /* Элементы управления располагаются вертикально */
+    gap: 15px; /* Расстояние между кнопками */
     z-index: 10;
 }
 
 .control-group {
     display: flex;
-    gap: 20px;
+    flex-direction: column; /* Кнопки внутри группы также вертикально */
+    gap: 15px;
     background-color: rgba(30, 30, 30, 0.7);
-    padding: 15px 25px;
+    padding: 15px; /* Уменьшаем padding для вертикального расположения */
     border-radius: 30px;
     backdrop-filter: blur(10px);
 }
@@ -190,6 +208,7 @@ body {
 
 .control-btn:hover {
     transform: scale(1.1);
+    color: var(--primary); /* Добавляем эффект при наведении */
 }
 
 .control-btn.active {
@@ -375,8 +394,13 @@ body {
         right: 15px;
     }
     
+    .video-controls {
+        bottom: 15px;
+        left: 15px;
+    }
+    
     .control-group {
-        padding: 12px 20px;
+        padding: 12px;
     }
     
     .modal-content {
@@ -400,15 +424,22 @@ body {
     
     .video-info {
         bottom: 70px;
+        left: 10px;
+        right: 10px;
     }
     
     .video-title {
         font-size: 1rem;
     }
     
+    .video-controls {
+        bottom: 10px;
+        left: 10px;
+    }
+    
     .control-group {
-        gap: 15px;
-        padding: 10px 15px;
+        gap: 10px;
+        padding: 10px;
     }
     
     .modal-content {
