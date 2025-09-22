@@ -128,7 +128,7 @@ function initVideos() {
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
             likes: 1245,
             comments: 89,
-            tags: ["путешествия", "природа", "красота"],
+            tags: ["путешествия", "природа", "красота", "мир"],
             category: "travel"
         },
         {
@@ -138,7 +138,7 @@ function initVideos() {
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
             likes: 3567,
             comments: 243,
-            tags: ["животные", "юмор", "смех"],
+            tags: ["животные", "юмор", "смех", "кошки", "собаки"],
             category: "humor"
         },
         {
@@ -148,7 +148,7 @@ function initVideos() {
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
             likes: 892,
             comments: 56,
-            tags: ["еда", "кулинария", "рецепты"],
+            tags: ["еда", "кулинария", "рецепты", "паста", "италия"],
             category: "food"
         },
         {
@@ -158,7 +158,7 @@ function initVideos() {
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
             likes: 2109,
             comments: 167,
-            tags: ["спорт", "экстрим", "приключения"],
+            tags: ["спорт", "экстрим", "приключения", "парашют", "высота"],
             category: "sport"
         },
         {
@@ -168,7 +168,7 @@ function initVideos() {
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
             likes: 3102,
             comments: 421,
-            tags: ["музыка", "клип", "поп"],
+            tags: ["музыка", "клип", "поп", "новинка", "хит"],
             category: "music"
         },
         {
@@ -178,7 +178,7 @@ function initVideos() {
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
             likes: 1500,
             comments: 100,
-            tags: ["путешествия", "природа", "горы"],
+            tags: ["путешествия", "природа", "горы", "норвегия", "фьорды"],
             category: "travel"
         },
         {
@@ -188,7 +188,7 @@ function initVideos() {
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
             likes: 4000,
             comments: 300,
-            tags: ["животные", "котики", "юмор"],
+            tags: ["животные", "котики", "юмор", "милота", "смех"],
             category: "humor"
         },
         {
@@ -198,8 +198,128 @@ function initVideos() {
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
             likes: 950,
             comments: 70,
-            tags: ["еда", "завтрак", "рецепты"],
+            tags: ["еда", "завтрак", "рецепты", "быстро", "вкусно"],
             category: "food"
+        },
+        {
+            id: 9,
+            title: "Топ-10 мест для дайвинга",
+            author: "Подводный Мир",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", // Используем существующее видео
+            likes: 1800,
+            comments: 120,
+            tags: ["путешествия", "дайвинг", "океан", "приключения", "подводный мир"],
+            category: "travel"
+        },
+        {
+            id: 10,
+            title: "Лучшие приколы 2023",
+            author: "Смеха ради",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4", // Используем существующее видео
+            likes: 5200,
+            comments: 450,
+            tags: ["юмор", "приколы", "смех", "комедия", "лучшее"],
+            category: "humor"
+        },
+        {
+            id: 11,
+            title: "Как приготовить идеальный стейк",
+            author: "Мясной Эксперт",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4", // Используем существующее видео
+            likes: 2300,
+            comments: 180,
+            tags: ["еда", "кулинария", "рецепты", "стейк", "мясо"],
+            category: "food"
+        },
+        {
+            id: 12,
+            title: "Тренировка для всего тела дома",
+            author: "Фитнес Гуру",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4", // Используем существующее видео
+            likes: 2900,
+            comments: 210,
+            tags: ["спорт", "фитнес", "тренировка", "дом", "здоровье"],
+            category: "sport"
+        },
+        {
+            id: 13,
+            title: "Инди-музыка: Открытие новых талантов",
+            author: "Музыкальный Критик",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Используем существующее видео
+            likes: 1100,
+            comments: 90,
+            tags: ["музыка", "инди", "таланты", "новинки", "обзор"],
+            category: "music"
+        },
+        {
+            id: 14,
+            title: "Загадки древних цивилизаций",
+            author: "Историк",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", // Используем существующее видео
+            likes: 1700,
+            comments: 110,
+            tags: ["история", "загадки", "цивилизации", "древний мир", "наука"],
+            category: "science" // Новая категория
+        },
+        {
+            id: 15,
+            title: "Обзор новых технологий 2024",
+            author: "ТехноБлогер",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", // Используем существующее видео
+            likes: 3800,
+            comments: 320,
+            tags: ["технологии", "обзор", "гаджеты", "будущее", "инновации"],
+            category: "tech" // Новая категория
+        },
+        {
+            id: 16,
+            title: "Уроки рисования для начинающих",
+            author: "Художник",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", // Используем существующее видео
+            likes: 900,
+            comments: 60,
+            tags: ["искусство", "рисование", "уроки", "творчество", "хобби"],
+            category: "art" // Новая категория
+        },
+        {
+            id: 17,
+            title: "Секреты продуктивности",
+            author: "Лайфхакер",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4", // Используем существующее видео
+            likes: 1400,
+            comments: 80,
+            tags: ["саморазвитие", "продуктивность", "советы", "лайфхаки", "мотивация"],
+            category: "education" // Новая категория
+        },
+        {
+            id: 18,
+            title: "Космические тайны: Черные дыры",
+            author: "Астрофизик",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4", // Используем существующее видео
+            likes: 2500,
+            comments: 190,
+            tags: ["космос", "наука", "астрономия", "черные дыры", "вселенная"],
+            category: "science"
+        },
+        {
+            id: 19,
+            title: "Лучшие моменты из игр",
+            author: "Геймер",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4", // Используем существующее видео
+            likes: 4100,
+            comments: 350,
+            tags: ["игры", "гейминг", "моменты", "развлечения", "киберспорт"],
+            category: "gaming" // Новая категория
+        },
+        {
+            id: 20,
+            title: "Уютный дом: Идеи для интерьера",
+            author: "Дизайнер",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Используем существующее видео
+            likes: 1000,
+            comments: 75,
+            tags: ["дом", "интерьер", "дизайн", "уют", "идеи"],
+            category: "lifestyle" // Новая категория
         }
     ];
     
@@ -1065,16 +1185,6 @@ function updateSearchInputColor() {
     // Для демонстрации, предположим, что все наши видео достаточно темные,
     // и белый текст будет хорошо виден.
     // Если бы были светлые видео, можно было бы менять на 'black' или 'var(--dark)'.
-
-    // Пример: если бы у видео был параметр `isLightBackground: true`
-    // const currentVideo = filteredVideos[currentVideoIndex];
-    // if (currentVideo && currentVideo.isLightBackground) {
-    //     document.documentElement.style.setProperty('--search-text-color', 'var(--dark)');
-    //     document.documentElement.style.setProperty('--search-placeholder-color', 'var(--dark-light)');
-    // } else {
-    //     document.documentElement.style.setProperty('--search-text-color', 'var(--light)');
-    //     document.documentElement.style.setProperty('--search-placeholder-color', 'var(--gray)');
-    // }
 
     // Пока просто устанавливаем светлый текст для всех видео
     document.documentElement.style.setProperty('--search-text-color', 'var(--light)');
