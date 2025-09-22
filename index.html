@@ -2,19 +2,20 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ТочкаСхода</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <!-- Главная страница с видео -->
     <div id="mainPage">
         <header class="header">
             <h1 class="logo">ТочкаСхода</h1>
-            <!-- Теперь всегда отображается меню пользователя -->
             <div id="userMenu" class="user-menu">
-                <span id="userName" class="user-name">Гость</span> <!-- Имя пользователя по умолчанию -->
+                <span id="userName" class="user-name">Гость</span>
                 <button id="profileBtn" class="auth-btn">Профиль</button>
             </div>
         </header>
@@ -39,6 +40,9 @@
                 </button>
                 <button id="shareBtn" class="control-btn">
                     <i class="fas fa-share"></i>
+                </button>
+                <button id="subscribeBtn" class="control-btn">
+                    <i class="fas fa-user-plus"></i>
                 </button>
             </div>
         </div>
@@ -68,11 +72,33 @@
                     <button id="closeProfileModal" class="close-btn">&times;</button>
                 </div>
                 <div class="profile-content">
-                    <p><strong>Имя пользователя:</strong> <span id="profileUsername">Гость</span></p>
-                    <p><strong>Email:</strong> <span id="profileEmail">guest@example.com</span></p>
-                    <h4>Сохраненные видео:</h4>
-                    <div id="savedVideosList" class="saved-videos-list">
-                        <!-- Сохраненные видео будут здесь -->
+                    <div class="profile-header-info">
+                        <div class="profile-avatar-large">
+                            <span id="profileAvatarLetter">Г</span>
+                        </div>
+                        <span id="profileUsername" class="profile-username">Гость</span>
+                        <span id="profileEmail" class="profile-email">guest@example.com</span>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h4><i class="fas fa-bookmark"></i> Сохраненные видео:</h4>
+                        <div id="savedVideosList" class="saved-videos-list">
+                            <!-- Сохраненные видео будут здесь -->
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <h4><i class="fas fa-user-check"></i> Мои подписки:</h4>
+                        <div id="subscriptionsList" class="subscriptions-list">
+                            <!-- Список подписок будет здесь -->
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <h4><i class="fas fa-bell"></i> Уведомления:</h4>
+                        <div id="notificationsList" class="notifications-list">
+                            <!-- Список уведомлений будет здесь -->
+                        </div>
                     </div>
                 </div>
             </div>

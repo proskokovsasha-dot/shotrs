@@ -5,7 +5,10 @@ let videos = [];
 let comments = {};
 let likedVideos = new Set();
 let savedVideos = new Set();
+let subscriptions = new Set(); // Подписки пользователя
+let notifications = []; // Уведомления пользователя
 let isTransitioning = false;
+let menuVisible = true; // Состояние видимости меню
 
 // Элементы DOM
 const mainPage = document.getElementById('mainPage');
@@ -19,6 +22,9 @@ const saveBtn = document.getElementById('saveBtn');
 const shareBtn = document.getElementById('shareBtn');
 const likeCount = document.getElementById('likeCount');
 const commentCount = document.getElementById('commentCount');
+const subscribeBtn = document.getElementById('subscribeBtn');
+const header = document.querySelector('.header'); // Добавляем хедер
+const videoControls = document.querySelector('.video-controls'); // Добавляем элементы управления видео
 
 // Модальные окна
 const commentModal = document.getElementById('commentModal');
@@ -35,19 +41,44 @@ const postComment = document.getElementById('postComment');
 const profileUsername = document.getElementById('profileUsername');
 const profileEmail = document.getElementById('profileEmail');
 const savedVideosList = document.getElementById('savedVideosList');
+const subscriptionsList = document.getElementById('subscriptionsList');
+const notificationsList = document.getElementById('notificationsList');
+const profileAvatarLetter = document.getElementById('profileAvatarLetter'); // Добавляем элемент для буквы аватара
 
 // Инициализация приложения
 document.addEventListener('DOMContentLoaded', function() {
-    // Загружаем понравившиеся видео
+    // Инициализация Telegram Web App
+    if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand(); // Развернуть на весь экран
+        // Устанавливаем цвет фона, если доступно
+        if (Telegram.WebApp.setBackgroundColor) {
+            Telegram.WebApp.setBackgroundColor('#121212'); // Соответствует var(--dark)
+        }
+        if (Telegram.WebApp.setHeaderColor) {
+            Telegram.WebApp.setHeaderColor('secondary_bg_color'); // Используем цвет фона заголовка Telegram
+        }
+    }
+
+    // Загружаем данные из localStorage
     const savedLikes = localStorage.getItem('likedVideos');
     if (savedLikes) {
         likedVideos = new Set(JSON.parse(savedLikes));
     }
 
-    // Загружаем сохраненные видео для текущего пользователя (Гостя)
     const userSavedVideos = localStorage.getItem(`savedVideos_${currentUser.username}`);
     if (userSavedVideos) {
         savedVideos = new Set(JSON.parse(userSavedVideos));
+    }
+
+    const savedSubscriptions = localStorage.getItem(`subscriptions_${currentUser.username}`);
+    if (savedSubscriptions) {
+        subscriptions = new Set(JSON.parse(savedSubscriptions));
+    }
+
+    const savedNotifications = localStorage.getItem(`notifications_${currentUser.username}`);
+    if (savedNotifications) {
+        notifications = JSON.parse(savedNotifications);
     }
     
     // Инициализируем видео
@@ -60,8 +91,9 @@ document.addEventListener('DOMContentLoaded', function() {
     renderVideos();
     updateVideoDisplay(currentVideoIndex);
 
-    // Обновляем имя пользователя в шапке
+    // Обновляем имя пользователя в шапке и букву аватара
     userName.textContent = currentUser.username;
+    profileAvatarLetter.textContent = currentUser.username.charAt(0).toUpperCase();
 });
 
 // Инициализация видео
@@ -133,6 +165,7 @@ function setupEventListeners() {
     commentBtn.addEventListener('click', showComments);
     saveBtn.addEventListener('click', toggleSaveVideo);
     shareBtn.addEventListener('click', shareVideo);
+    subscribeBtn.addEventListener('click', toggleSubscribe);
     
     // Комментарии
     postComment.addEventListener('click', addComment);
@@ -144,6 +177,7 @@ function setupEventListeners() {
     
     // Свайпы для мобильных устройств и прокрутка для десктопа
     setupVideoNavigation();
+    setupMenuToggleOnSwipe(); // Добавляем обработчик для свайпа меню
 }
 
 // Показать уведомление
@@ -198,7 +232,8 @@ function renderVideos() {
         videoItem.dataset.index = index;
         
         videoItem.innerHTML = `
-            <video loop muted>
+            <div class="video-loader"></div> <!-- Лоадер -->
+            <video loop muted playsinline preload="auto">
                 <source src="${video.videoUrl}" type="video/mp4">
                 Ваш браузер не поддерживает видео.
             </video>
@@ -212,6 +247,53 @@ function renderVideos() {
         `;
         
         videoCarousel.appendChild(videoItem);
+
+        // Скрываем лоадер, когда видео готово к воспроизведению
+        const videoElement = videoItem.querySelector('video');
+        const loaderElement = videoItem.querySelector('.video-loader');
+        videoElement.addEventListener('canplaythrough', () => {
+            loaderElement.style.display = 'none';
+        });
+        videoElement.addEventListener('waiting', () => {
+            loaderElement.style.display = 'block';
+        });
+
+        // Обработчик двойного тапа для лайка
+        let lastTap = 0;
+        videoElement.addEventListener('touchend', function(event) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 300 && tapLength > 0) { // Двойной тап
+                event.preventDefault();
+                if (index === currentVideoIndex) { // Лайкаем только активное видео
+                    toggleLike();
+                    showDoubleTapLikeAnimation(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+                }
+            }
+            lastTap = currentTime;
+        });
+
+        // Обработчик двойного клика для лайка на десктопе
+        videoElement.addEventListener('dblclick', function(event) {
+            if (index === currentVideoIndex) { // Лайкаем только активное видео
+                toggleLike();
+                showDoubleTapLikeAnimation(event.clientX, event.clientY);
+            }
+        });
+    });
+}
+
+// Показать анимацию лайка при двойном тапе/клике
+function showDoubleTapLikeAnimation(x, y) {
+    const likeAnimation = document.createElement('div');
+    likeAnimation.className = 'double-tap-like-animation';
+    likeAnimation.innerHTML = '<i class="fas fa-heart"></i>';
+    likeAnimation.style.left = `${x}px`;
+    likeAnimation.style.top = `${y}px`;
+    document.body.appendChild(likeAnimation);
+
+    likeAnimation.addEventListener('animationend', () => {
+        likeAnimation.remove();
     });
 }
 
@@ -256,15 +338,29 @@ function updateVideoDisplay(index) {
     
     // Обновляем состояние кнопки сохранения
     updateSaveButtonState(video.id);
+
+    // Обновляем состояние кнопки подписки
+    updateSubscribeButtonState(video.author);
     
     // Воспроизводим новое видео после небольшой задержки
     setTimeout(() => {
-        const newVideoElement = document.querySelector('.video-item.active video');
-        if (newVideoElement) {
-            newVideoElement.play().catch(e => console.log('Автовоспроизведение заблокировано:', e));
-        }
+        const newVideoItem = document.querySelector('.video-item.active');
+        const newVideoElement = newVideoItem.querySelector('video');
+        const newLoaderElement = newVideoItem.querySelector('.video-loader');
+
+        // Показываем лоадер перед попыткой воспроизведения
+        if (newLoaderElement) newLoaderElement.style.display = 'block';
+
+        newVideoElement.play().then(() => {
+            // Скрываем лоадер, если воспроизведение началось
+            if (newLoaderElement) newLoaderElement.style.display = 'none';
+        }).catch(e => {
+            console.log('Автовоспроизведение заблокировано или ошибка:', e);
+            // Скрываем лоадер даже при ошибке, чтобы не висел бесконечно
+            if (newLoaderElement) newLoaderElement.style.display = 'none';
+        });
         isTransitioning = false;
-    }, 300);
+    }, 300); // Задержка соответствует CSS transition duration
     
     currentVideoIndex = index;
 }
@@ -277,6 +373,19 @@ function updateSaveButtonState(videoId) {
     } else {
         saveBtn.classList.remove('active');
         saveBtn.innerHTML = '<i class="far fa-bookmark"></i>';
+    }
+}
+
+// Обновление состояния кнопки подписки
+function updateSubscribeButtonState(authorName) {
+    if (subscriptions.has(authorName)) {
+        subscribeBtn.classList.add('active');
+        subscribeBtn.innerHTML = '<i class="fas fa-user-check"></i>';
+        subscribeBtn.title = 'Вы подписаны';
+    } else {
+        subscribeBtn.classList.remove('active');
+        subscribeBtn.innerHTML = '<i class="fas fa-user-plus"></i>';
+        subscribeBtn.title = 'Подписаться';
     }
 }
 
@@ -306,7 +415,7 @@ function setupVideoNavigation() {
             const currentY = e.touches[0].clientY;
             const diffY = startY - currentY;
             
-            if (Math.abs(diffY) > 50) {
+            if (Math.abs(diffY) > 50) { // Порог для свайпа
                 isScrolling = true;
                 
                 if (diffY > 0 && currentVideoIndex < videos.length - 1) {
@@ -324,11 +433,9 @@ function setupVideoNavigation() {
     document.addEventListener('wheel', (e) => {
         if (isTransitioning) return;
         
-        if (e.deltaY > 50 && currentVideoIndex < videos.length - 1) {
-            // Прокрутка вниз - следующее видео
+        if (e.deltaY > 50 && currentVideoIndex < videos.length - 1) { // Прокрутка вниз - следующее видео
             updateVideoDisplay(currentVideoIndex + 1);
-        } else if (e.deltaY < -50 && currentVideoIndex > 0) {
-            // Прокрутка вверх - предыдущее видео
+        } else if (e.deltaY < -50 && currentVideoIndex > 0) { // Покрутка вверх - предыдущее видео
             updateVideoDisplay(currentVideoIndex - 1);
         }
     });
@@ -345,6 +452,54 @@ function setupVideoNavigation() {
     });
 }
 
+// Настройка скрытия/показа меню по свайпу
+function setupMenuToggleOnSwipe() {
+    let startX = 0;
+    let startY = 0;
+    let isSwiping = false;
+
+    document.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        isSwiping = false;
+    });
+
+    document.addEventListener('touchmove', (e) => {
+        if (isSwiping) return; 
+        
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = currentX - startX;
+        const diffY = currentY - startY;
+
+        // Определяем, является ли движение горизонтальным свайпом и достаточно ли оно значимо
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) { 
+            isSwiping = true;
+            if (diffX > 0 && !menuVisible) { // Свайп вправо - показать меню
+                toggleMenuVisibility(true);
+            } else if (diffX < 0 && menuVisible) { // Свайп влево - скрыть меню
+                toggleMenuVisibility(false);
+            }
+        }
+    });
+
+    document.addEventListener('touchend', () => {
+        isSwiping = false;
+    });
+}
+
+// Переключение видимости меню
+function toggleMenuVisibility(show) {
+    menuVisible = show;
+    if (menuVisible) {
+        header.classList.remove('hidden');
+        videoControls.classList.remove('hidden');
+    } else {
+        header.classList.add('hidden');
+        videoControls.classList.add('hidden');
+    }
+}
+
 // Переключение лайка
 function toggleLike() {
     const video = videos[currentVideoIndex];
@@ -357,6 +512,7 @@ function toggleLike() {
         likedVideos.add(video.id);
         likeBtn.classList.add('active');
         likeBtn.innerHTML = '<i class="fas fa-heart"></i><span class="control-count" id="likeCount">' + formatCount(video.likes + 1) + '</span>';
+        addNotification(`Вам понравился ролик "${video.title}"`);
     }
     
     // Сохраняем лайки в localStorage
@@ -381,6 +537,23 @@ function toggleSaveVideo() {
     
     // Сохраняем сохраненные видео для текущего пользователя
     localStorage.setItem(`savedVideos_${currentUser.username}`, JSON.stringify([...savedVideos]));
+}
+
+// Переключение подписки на автора
+function toggleSubscribe() {
+    const video = videos[currentVideoIndex];
+    const authorName = video.author;
+
+    if (subscriptions.has(authorName)) {
+        subscriptions.delete(authorName);
+        showNotification(`Вы отписались от ${authorName}`, 'info');
+    } else {
+        subscriptions.add(authorName);
+        showNotification(`Вы подписались на ${authorName}`, 'success');
+        addNotification(`Вы подписались на автора "${authorName}"`);
+    }
+    localStorage.setItem(`subscriptions_${currentUser.username}`, JSON.stringify([...subscriptions]));
+    updateSubscribeButtonState(authorName);
 }
 
 // Показать комментарии
@@ -453,6 +626,8 @@ function addComment() {
     
     // Прокручиваем к новому комментарию
     commentsList.scrollTop = commentsList.scrollHeight;
+
+    addNotification(`Вы оставили комментарий к ролику "${video.title}"`);
 }
 
 // Поделиться видео
@@ -483,8 +658,11 @@ function shareVideo() {
 function showProfileModal() {
     profileUsername.textContent = currentUser.username;
     profileEmail.textContent = currentUser.email;
+    profileAvatarLetter.textContent = currentUser.username.charAt(0).toUpperCase(); // Обновляем букву аватара
     
     renderSavedVideos();
+    renderSubscriptions();
+    renderNotifications();
     profileModal.classList.add('active');
 }
 
@@ -498,7 +676,7 @@ function renderSavedVideos() {
     savedVideosList.innerHTML = '';
     
     if (savedVideos.size === 0) {
-        savedVideosList.innerHTML = '<p style="text-align: center; color: var(--gray);">У вас нет сохраненных видео</p>';
+        savedVideosList.innerHTML = '<p class="empty-state">У вас нет сохраненных видео</p>';
         return;
     }
     
@@ -525,5 +703,68 @@ function renderSavedVideos() {
             
             savedVideosList.appendChild(videoItem);
         }
+    });
+}
+
+// Рендеринг подписок
+function renderSubscriptions() {
+    subscriptionsList.innerHTML = '';
+    if (subscriptions.size === 0) {
+        subscriptionsList.innerHTML = '<p class="empty-state">Вы ни на кого не подписаны</p>';
+        return;
+    }
+
+    subscriptions.forEach(authorName => {
+        const subscriptionItem = document.createElement('div');
+        subscriptionItem.className = 'subscription-item';
+        subscriptionItem.innerHTML = `
+            <div class="author-avatar">${authorName.charAt(0)}</div>
+            <span>${authorName}</span>
+            <button class="unsubscribe-btn" data-author="${authorName}"><i class="fas fa-user-minus"></i></button>
+        `;
+        subscriptionsList.appendChild(subscriptionItem);
+    });
+
+    document.querySelectorAll('.unsubscribe-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const authorToUnsubscribe = e.currentTarget.dataset.author;
+            subscriptions.delete(authorToUnsubscribe);
+            localStorage.setItem(`subscriptions_${currentUser.username}`, JSON.stringify([...subscriptions]));
+            renderSubscriptions();
+            showNotification(`Вы отписались от ${authorToUnsubscribe}`, 'info');
+            // Если текущее видео от этого автора, обновить кнопку подписки
+            if (videos[currentVideoIndex].author === authorToUnsubscribe) {
+                updateSubscribeButtonState(authorToUnsubscribe);
+            }
+        });
+    });
+}
+
+// Добавление уведомления
+function addNotification(message) {
+    const timestamp = new Date().toLocaleTimeString();
+    notifications.unshift({ message, timestamp }); // Добавляем в начало
+    if (notifications.length > 10) { // Ограничиваем количество уведомлений
+        notifications.pop();
+    }
+    localStorage.setItem(`notifications_${currentUser.username}`, JSON.stringify(notifications));
+}
+
+// Рендеринг уведомлений
+function renderNotifications() {
+    notificationsList.innerHTML = '';
+    if (notifications.length === 0) {
+        notificationsList.innerHTML = '<p class="empty-state">У вас нет новых уведомлений</p>';
+        return;
+    }
+
+    notifications.forEach(notification => {
+        const notificationItem = document.createElement('div');
+        notificationItem.className = 'notification-item';
+        notificationItem.innerHTML = `
+            <span class="notification-message">${notification.message}</span>
+            <span class="notification-timestamp">${notification.timestamp}</span>
+        `;
+        notificationsList.appendChild(notificationItem);
     });
 }
