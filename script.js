@@ -1,7 +1,8 @@
 // Данные приложения
 let currentUser = { username: "Гость", email: "guest@example.com" }; // Пользователь по умолчанию
 let currentVideoIndex = 0;
-let videos = [];
+let videos = []; // Все видео
+let filteredVideos = []; // Видео после применения фильтров и поиска
 let comments = {};
 let likedVideos = new Set();
 let savedVideos = new Set();
@@ -9,6 +10,11 @@ let subscriptions = new Set(); // Подписки пользователя
 let notifications = []; // Уведомления пользователя
 let isTransitioning = false;
 let menuVisible = true; // Состояние видимости меню
+
+// Состояние фильтров
+let currentSearchQuery = '';
+let currentCategoryFilter = 'all';
+let currentSortOrder = 'default';
 
 // Элементы DOM
 const mainPage = document.getElementById('mainPage');
@@ -26,11 +32,18 @@ const subscribeBtn = document.getElementById('subscribeBtn');
 const header = document.querySelector('.header'); // Добавляем хедер
 const videoControls = document.querySelector('.video-controls'); // Добавляем элементы управления видео
 
+// Элементы поиска и фильтров
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+const searchContainer = document.querySelector('.search-container'); // Добавляем searchContainer
+
 // Модальные окна
 const commentModal = document.getElementById('commentModal');
 const profileModal = document.getElementById('profileModal');
+const filterModal = document.getElementById('filterModal'); // Модальное окно фильтров
 const closeCommentModal = document.getElementById('closeCommentModal');
 const closeProfileModal = document.getElementById('closeProfileModal');
+const closeFilterModal = document.getElementById('closeFilterModal'); // Кнопка закрытия фильтров
 
 // Комментарии
 const commentsList = document.querySelector('.comments-list');
@@ -40,10 +53,18 @@ const postComment = document.getElementById('postComment');
 // Профиль
 const profileUsername = document.getElementById('profileUsername');
 const profileEmail = document.getElementById('profileEmail');
+const profileAvatarLetter = document.getElementById('profileAvatarLetter');
+const profileLikesCount = document.getElementById('profileLikesCount');
+const profileCommentsCount = document.getElementById('profileCommentsCount');
+const profileSubscriptionsCount = document.getElementById('profileSubscriptionsCount');
 const savedVideosList = document.getElementById('savedVideosList');
 const subscriptionsList = document.getElementById('subscriptionsList');
 const notificationsList = document.getElementById('notificationsList');
-const profileAvatarLetter = document.getElementById('profileAvatarLetter'); // Добавляем элемент для буквы аватара
+
+// Фильтры
+const categoryButtons = document.querySelectorAll('.filter-category-btn');
+const sortButtons = document.querySelectorAll('.filter-sort-btn');
+const applyFiltersBtn = document.getElementById('applyFiltersBtn');
 
 // Инициализация приложения
 document.addEventListener('DOMContentLoaded', function() {
@@ -89,16 +110,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Настройка обработчиков событий
     setupEventListeners();
     
-    // Рендерим все видео и показываем первое
-    renderVideos();
-    updateVideoDisplay(currentVideoIndex);
+    // Применяем начальные фильтры и рендерим видео
+    applyFiltersAndRenderVideos();
 
     // Обновляем имя пользователя в шапке и букву аватара
     userName.textContent = currentUser.username;
     profileAvatarLetter.textContent = currentUser.username.charAt(0).toUpperCase();
 });
 
-// Инициализация видео (без изменений)
+// Инициализация видео
 function initVideos() {
     videos = [
         {
@@ -107,7 +127,9 @@ function initVideos() {
             author: "Путешественник",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
             likes: 1245,
-            comments: 89
+            comments: 89,
+            tags: ["путешествия", "природа", "красота"],
+            category: "travel"
         },
         {
             id: 2,
@@ -115,31 +137,69 @@ function initVideos() {
             author: "ЗооБлог",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
             likes: 3567,
-            comments: 243
+            comments: 243,
+            tags: ["животные", "юмор", "смех"],
+            category: "humor"
         },
         {
             id: 3,
-            title: "Кулинарный мастер-класс",
+            title: "Кулинарный мастер-класс: Итальянская паста",
             author: "ШефПовар",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
             likes: 892,
-            comments: 56
+            comments: 56,
+            tags: ["еда", "кулинария", "рецепты"],
+            category: "food"
         },
         {
             id: 4,
-            title: "Экстремальный спорт",
+            title: "Экстремальный спорт: Прыжки с парашютом",
             author: "Адреналин",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
             likes: 2109,
-            comments: 167
+            comments: 167,
+            tags: ["спорт", "экстрим", "приключения"],
+            category: "sport"
         },
         {
             id: 5,
-            title: "Музыкальный клип",
+            title: "Музыкальный клип: Новая волна",
             author: "Артист",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
             likes: 3102,
-            comments: 421
+            comments: 421,
+            tags: ["музыка", "клип", "поп"],
+            category: "music"
+        },
+        {
+            id: 6,
+            title: "Путешествие по Норвегии",
+            author: "Путешественник",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            likes: 1500,
+            comments: 100,
+            tags: ["путешествия", "природа", "горы"],
+            category: "travel"
+        },
+        {
+            id: 7,
+            title: "Забавные котики",
+            author: "ЗооБлог",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+            likes: 4000,
+            comments: 300,
+            tags: ["животные", "котики", "юмор"],
+            category: "humor"
+        },
+        {
+            id: 8,
+            title: "Быстрые рецепты для завтрака",
+            author: "ШефПовар",
+            videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+            likes: 950,
+            comments: 70,
+            tags: ["еда", "завтрак", "рецепты"],
+            category: "food"
         }
     ];
     
@@ -151,9 +211,22 @@ function initVideos() {
             { user: "Дмитрий", text: "Интересно, где это снято?" }
         ];
     });
+
+    // Инициализируем filteredVideos всеми видео
+    filteredVideos = [...videos];
 }
 
-// Настройка обработчиков событий (без изменений)
+// Вспомогательная функция debounce для задержки выполнения
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), delay);
+    };
+}
+
+// Настройка обработчиков событий
 function setupEventListeners() {
     // Профиль
     profileBtn.addEventListener('click', showProfileModal);
@@ -161,6 +234,7 @@ function setupEventListeners() {
     // Модальные окна
     closeCommentModal.addEventListener('click', hideComments);
     closeProfileModal.addEventListener('click', hideProfileModal);
+    closeFilterModal.addEventListener('click', hideFilterModal);
     
     // Управление видео
     likeBtn.addEventListener('click', toggleLike);
@@ -180,9 +254,70 @@ function setupEventListeners() {
     // Свайпы для мобильных устройств и прокрутка для десктопа
     setupVideoNavigation();
     setupMenuToggleOnSwipe(); // Добавляем обработчик для свайпа меню
+
+    // Поиск и фильтры
+    // Используем debounce для searchInput, чтобы избежать мерцания
+    searchInput.addEventListener('input', debounce((e) => {
+        currentSearchQuery = e.target.value.toLowerCase();
+        applyFiltersAndRenderVideos();
+    }, 300)); // Задержка 300 мс
+
+    // Обработчик для кнопки поиска
+    searchBtn.addEventListener('click', () => {
+        if (window.innerWidth <= 768) { // Для мобильных устройств
+            // Переключаем активное состояние хедера для раскрытия поиска
+            header.classList.toggle('search-active');
+            if (header.classList.contains('search-active')) {
+                searchInput.focus(); // Фокусируемся на поле ввода
+            } else {
+                searchInput.blur(); // Убираем фокус
+            }
+        } else { // Для десктопных устройств
+            showFilterModal(); // Открываем модальное окно фильтров
+        }
+    });
+
+    // Обработчики фокуса для searchInput для мобильных устройств
+    searchInput.addEventListener('focus', () => {
+        if (window.innerWidth <= 768) { // Применяем только для мобильных
+            header.classList.add('search-active');
+            userMenu.classList.add('hidden');
+        }
+    });
+
+    searchInput.addEventListener('blur', () => {
+        if (window.innerWidth <= 768) { // Применяем только для мобильных
+            // Если поле ввода пустое, скрываем его
+            if (searchInput.value === '') {
+                header.classList.remove('search-active');
+                userMenu.classList.remove('hidden');
+            }
+        }
+    });
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            currentCategoryFilter = button.dataset.category;
+        });
+    });
+
+    sortButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            sortButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            currentSortOrder = button.dataset.sort;
+        });
+    });
+
+    applyFiltersBtn.addEventListener('click', () => {
+        applyFiltersAndRenderVideos();
+        hideFilterModal();
+    });
 }
 
-// Показать уведомление (без изменений)
+// Показать уведомление
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -224,11 +359,20 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Рендеринг видео (без изменений)
+// Рендеринг видео
 function renderVideos() {
     videoCarousel.innerHTML = '';
     
-    videos.forEach((video, index) => {
+    if (filteredVideos.length === 0) {
+        videoCarousel.innerHTML = '<p class="empty-state" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">Видео не найдено по вашему запросу.</p>';
+        // Скрываем элементы управления, если нет видео
+        videoControls.classList.add('hidden');
+        return;
+    } else {
+        videoControls.classList.remove('hidden');
+    }
+
+    filteredVideos.forEach((video, index) => {
         const videoItem = document.createElement('div');
         videoItem.className = `video-item ${index === currentVideoIndex ? 'active' : ''}`;
         videoItem.dataset.index = index;
@@ -288,7 +432,7 @@ function renderVideos() {
     });
 }
 
-// Показать анимацию лайка при двойном тапе/клике (без изменений)
+// Показать анимацию лайка при двойном тапе/клике
 function showDoubleTapLikeAnimation(x, y) {
     const likeAnimation = document.createElement('div');
     likeAnimation.className = 'double-tap-like-animation';
@@ -302,9 +446,9 @@ function showDoubleTapLikeAnimation(x, y) {
     });
 }
 
-// Обновление отображения видео (без изменений)
+// Обновление отображения видео
 function updateVideoDisplay(index) {
-    if (isTransitioning || index < 0 || index >= videos.length) return;
+    if (isTransitioning || index < 0 || index >= filteredVideos.length) return;
     
     isTransitioning = true;
     
@@ -328,7 +472,7 @@ function updateVideoDisplay(index) {
     });
     
     // Обновляем счетчики лайков и комментариев
-    const video = videos[index];
+    const video = filteredVideos[index];
     likeCount.textContent = formatCount(video.likes + (likedVideos.has(video.id) ? 1 : 0));
     commentCount.textContent = formatCount(video.comments + (comments[video.id] ? comments[video.id].length : 0));
     
@@ -346,6 +490,9 @@ function updateVideoDisplay(index) {
 
     // Обновляем состояние кнопки подписки
     updateSubscribeButtonState(video.author);
+
+    // Обновляем цвет текста в поисковой строке
+    updateSearchInputColor();
     
     // Воспроизводим новое видео после небольшой задержки
     setTimeout(() => {
@@ -370,7 +517,7 @@ function updateVideoDisplay(index) {
     currentVideoIndex = index;
 }
 
-// Обновление состояния кнопки сохранения (без изменений)
+// Обновление состояния кнопки сохранения
 function updateSaveButtonState(videoId) {
     if (savedVideos.has(videoId)) {
         saveBtn.classList.add('active');
@@ -381,7 +528,7 @@ function updateSaveButtonState(videoId) {
     }
 }
 
-// Обновление состояния кнопки подписки (без изменений)
+// Обновление состояния кнопки подписки
 function updateSubscribeButtonState(authorName) {
     if (subscriptions.has(authorName)) {
         subscribeBtn.classList.add('active');
@@ -394,7 +541,7 @@ function updateSubscribeButtonState(authorName) {
     }
 }
 
-// Форматирование счетчиков (без изменений)
+// Форматирование счетчиков
 function formatCount(count) {
     if (count >= 1000000) {
         return (count / 1000000).toFixed(1) + 'M';
@@ -404,7 +551,7 @@ function formatCount(count) {
     return count.toString();
 }
 
-// Настройка навигации по видео (без изменений)
+// Настройка навигации по видео
 function setupVideoNavigation() {
     let startY = 0;
     let isScrolling = false;
@@ -417,7 +564,7 @@ function setupVideoNavigation() {
 
     document.addEventListener('touchmove', (e) => {
         // Если открыто модальное окно, не обрабатываем свайпы для видео
-        if (commentModal.classList.contains('active') || profileModal.classList.contains('active')) {
+        if (commentModal.classList.contains('active') || profileModal.classList.contains('active') || filterModal.classList.contains('active')) {
             return;
         }
 
@@ -430,7 +577,7 @@ function setupVideoNavigation() {
             if (!isScrolling) {
                 isScrolling = true;
                 
-                if (diffY > 0 && currentVideoIndex < videos.length - 1) {
+                if (diffY > 0 && currentVideoIndex < filteredVideos.length - 1) {
                     // Свайп вверх - следующее видео
                     updateVideoDisplay(currentVideoIndex + 1);
                 } else if (diffY < 0 && currentVideoIndex > 0) {
@@ -446,13 +593,13 @@ function setupVideoNavigation() {
         if (isTransitioning) return;
         
         // Если открыто модальное окно, не обрабатываем прокрутку для видео
-        if (commentModal.classList.contains('active') || profileModal.classList.contains('active')) {
+        if (commentModal.classList.contains('active') || profileModal.classList.contains('active') || filterModal.classList.contains('active')) {
             return;
         }
 
         e.preventDefault(); // Предотвращаем прокрутку страницы
         
-        if (e.deltaY > 50 && currentVideoIndex < videos.length - 1) { // Прокрутка вниз - следующее видео
+        if (e.deltaY > 50 && currentVideoIndex < filteredVideos.length - 1) { // Прокрутка вниз - следующее видео
             updateVideoDisplay(currentVideoIndex + 1);
         } else if (e.deltaY < -50 && currentVideoIndex > 0) { // Покрутка вверх - предыдущее видео
             updateVideoDisplay(currentVideoIndex - 1);
@@ -464,11 +611,11 @@ function setupVideoNavigation() {
         if (isTransitioning) return;
         
         // Если открыто модальное окно, не обрабатываем клавиши для видео
-        if (commentModal.classList.contains('active') || profileModal.classList.contains('active')) {
+        if (commentModal.classList.contains('active') || profileModal.classList.contains('active') || filterModal.classList.contains('active')) {
             return;
         }
 
-        if (e.key === 'ArrowDown' && currentVideoIndex < videos.length - 1) {
+        if (e.key === 'ArrowDown' && currentVideoIndex < filteredVideos.length - 1) {
             e.preventDefault(); // Предотвращаем прокрутку страницы
             updateVideoDisplay(currentVideoIndex + 1);
         } else if (e.key === 'ArrowUp' && currentVideoIndex > 0) {
@@ -478,7 +625,7 @@ function setupVideoNavigation() {
     });
 }
 
-// Настройка скрытия/показа меню по свайпу (без изменений)
+// Настройка скрытия/показа меню по свайпу
 function setupMenuToggleOnSwipe() {
     let startX = 0;
     let startY = 0;
@@ -492,7 +639,7 @@ function setupMenuToggleOnSwipe() {
 
     document.addEventListener('touchmove', (e) => {
         // Если открыто модальное окно, не обрабатываем свайпы для меню
-        if (commentModal.classList.contains('active') || profileModal.classList.contains('active')) {
+        if (commentModal.classList.contains('active') || profileModal.classList.contains('active') || filterModal.classList.contains('active')) {
             return;
         }
 
@@ -520,7 +667,7 @@ function setupMenuToggleOnSwipe() {
     });
 }
 
-// Переключение видимости меню (без изменений)
+// Переключение видимости меню
 function toggleMenuVisibility(show) {
     menuVisible = show;
     if (menuVisible) {
@@ -532,9 +679,9 @@ function toggleMenuVisibility(show) {
     }
 }
 
-// Переключение лайка (без изменений)
+// Переключение лайка
 function toggleLike() {
-    const video = videos[currentVideoIndex];
+    const video = filteredVideos[currentVideoIndex];
     
     if (likedVideos.has(video.id)) {
         likedVideos.delete(video.id);
@@ -551,9 +698,9 @@ function toggleLike() {
     localStorage.setItem('likedVideos', JSON.stringify([...likedVideos]));
 }
 
-// Переключение сохранения видео (без изменений)
+// Переключение сохранения видео
 function toggleSaveVideo() {
-    const video = videos[currentVideoIndex];
+    const video = filteredVideos[currentVideoIndex];
     
     if (savedVideos.has(video.id)) {
         savedVideos.delete(video.id);
@@ -571,9 +718,9 @@ function toggleSaveVideo() {
     localStorage.setItem(`savedVideos_${currentUser.username}`, JSON.stringify([...savedVideos]));
 }
 
-// Переключение подписки на автора (без изменений)
+// Переключение подписки на автора
 function toggleSubscribe() {
-    const video = videos[currentVideoIndex];
+    const video = filteredVideos[currentVideoIndex];
     const authorName = video.author;
 
     if (subscriptions.has(authorName)) {
@@ -590,7 +737,7 @@ function toggleSubscribe() {
 
 // Показать комментарии
 function showComments() {
-    const video = videos[currentVideoIndex];
+    const video = filteredVideos[currentVideoIndex];
     renderComments(video.id);
     commentModal.classList.add('active');
     commentText.focus();
@@ -610,7 +757,7 @@ function hideComments() {
     }
 }
 
-// Рендеринг комментариев (без изменений)
+// Рендеринг комментариев
 function renderComments(videoId) {
     commentsList.innerHTML = '';
     
@@ -635,7 +782,7 @@ function renderComments(videoId) {
     });
 }
 
-// Добавление комментария (без изменений)
+// Добавление комментария
 function addComment() {
     const text = commentText.value.trim();
     
@@ -644,7 +791,7 @@ function addComment() {
         return;
     }
     
-    const video = videos[currentVideoIndex];
+    const video = filteredVideos[currentVideoIndex];
     
     if (!comments[video.id]) {
         comments[video.id] = [];
@@ -670,9 +817,9 @@ function addComment() {
     addNotification(`Вы оставили комментарий к ролику "${video.title}"`);
 }
 
-// Поделиться видео (без изменений)
+// Поделиться видео
 function shareVideo() {
-    const video = videos[currentVideoIndex];
+    const video = filteredVideos[currentVideoIndex];
     
     if (navigator.share) {
         navigator.share({
@@ -700,6 +847,9 @@ function showProfileModal() {
     profileEmail.textContent = currentUser.email;
     profileAvatarLetter.textContent = currentUser.username.charAt(0).toUpperCase(); // Обновляем букву аватара
     
+    // Обновляем статистику профиля
+    updateProfileStats();
+
     renderSavedVideos();
     renderSubscriptions();
     renderNotifications();
@@ -719,7 +869,23 @@ function hideProfileModal() {
     }
 }
 
-// Рендеринг сохраненных видео (без изменений)
+// Обновление статистики профиля
+function updateProfileStats() {
+    let totalLikes = 0;
+    let totalComments = 0;
+
+    // Суммируем лайки и комментарии по всем видео
+    videos.forEach(video => {
+        totalLikes += video.likes + (likedVideos.has(video.id) ? 1 : 0);
+        totalComments += video.comments + (comments[video.id] ? comments[video.id].length : 0);
+    });
+
+    profileLikesCount.textContent = formatCount(totalLikes);
+    profileCommentsCount.textContent = formatCount(totalComments);
+    profileSubscriptionsCount.textContent = subscriptions.size.toString();
+}
+
+// Рендеринг сохраненных видео
 function renderSavedVideos() {
     savedVideosList.innerHTML = '';
     
@@ -741,11 +907,22 @@ function renderSavedVideos() {
             `;
             
             videoItem.addEventListener('click', () => {
-                // Находим индекс видео и переключаемся на него
-                const index = videos.findIndex(v => v.id === videoId);
+                // Находим индекс видео в отфильтрованном списке и переключаемся на него
+                const index = filteredVideos.findIndex(v => v.id === videoId);
                 if (index !== -1) {
                     updateVideoDisplay(index);
                     hideProfileModal();
+                } else {
+                    // Если видео не в текущем отфильтрованном списке, сбрасываем фильтры и показываем его
+                    currentSearchQuery = '';
+                    currentCategoryFilter = 'all';
+                    currentSortOrder = 'default';
+                    applyFiltersAndRenderVideos();
+                    const newIndex = filteredVideos.findIndex(v => v.id === videoId);
+                    if (newIndex !== -1) {
+                        updateVideoDisplay(newIndex);
+                        hideProfileModal();
+                    }
                 }
             });
             
@@ -754,7 +931,7 @@ function renderSavedVideos() {
     });
 }
 
-// Рендеринг подписок (без изменений)
+// Рендеринг подписок
 function renderSubscriptions() {
     subscriptionsList.innerHTML = '';
     if (subscriptions.size === 0) {
@@ -781,14 +958,15 @@ function renderSubscriptions() {
             renderSubscriptions();
             showNotification(`Вы отписались от ${authorToUnsubscribe}`, 'info');
             // Если текущее видео от этого автора, обновить кнопку подписки
-            if (videos[currentVideoIndex].author === authorToUnsubscribe) {
+            if (filteredVideos[currentVideoIndex] && filteredVideos[currentVideoIndex].author === authorToUnsubscribe) {
                 updateSubscribeButtonState(authorToUnsubscribe);
             }
+            updateProfileStats(); // Обновить статистику подписок
         });
     });
 }
 
-// Добавление уведомления (без изменений)
+// Добавление уведомления
 function addNotification(message) {
     const timestamp = new Date().toLocaleTimeString();
     notifications.unshift({ message, timestamp }); // Добавляем в начало
@@ -798,7 +976,7 @@ function addNotification(message) {
     localStorage.setItem(`notifications_${currentUser.username}`, JSON.stringify(notifications));
 }
 
-// Рендеринг уведомлений (без изменений)
+// Рендеринг уведомлений
 function renderNotifications() {
     notificationsList.innerHTML = '';
     if (notifications.length === 0) {
@@ -815,4 +993,90 @@ function renderNotifications() {
         `;
         notificationsList.appendChild(notificationItem);
     });
+}
+
+// Показать модальное окно фильтров
+function showFilterModal() {
+    filterModal.classList.add('active');
+    // Отключаем свайпы в Telegram Web App, пока модальное окно открыто
+    if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.disableVerticalSwipes();
+    }
+}
+
+// Скрыть модальное окно фильтров
+function hideFilterModal() {
+    filterModal.classList.remove('active');
+    // Включаем свайпы в Telegram Web App, когда модальное окно закрыто
+    if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.enableVerticalSwipes();
+    }
+}
+
+// Применение фильтров и рендеринг видео
+function applyFiltersAndRenderVideos() {
+    let tempVideos = [...videos];
+
+    // 1. Поиск по названию, автору, тегам
+    if (currentSearchQuery) {
+        tempVideos = tempVideos.filter(video => 
+            video.title.toLowerCase().includes(currentSearchQuery) ||
+            video.author.toLowerCase().includes(currentSearchQuery) ||
+            (video.tags && video.tags.some(tag => tag.toLowerCase().includes(currentSearchQuery)))
+        );
+    }
+
+    // 2. Фильтр по категории
+    if (currentCategoryFilter !== 'all') {
+        tempVideos = tempVideos.filter(video => video.category === currentCategoryFilter);
+    }
+
+    // 3. Сортировка
+    if (currentSortOrder === 'likes') {
+        tempVideos.sort((a, b) => (b.likes + (likedVideos.has(b.id) ? 1 : 0)) - (a.likes + (likedVideos.has(a.id) ? 1 : 0)));
+    } else if (currentSortOrder === 'comments') {
+        tempVideos.sort((a, b) => (b.comments + (comments[b.id] ? comments[b.id].length : 0)) - (a.comments + (comments[a.id] ? comments[a.id].length : 0)));
+    }
+    // 'default' не требует сортировки, так как массив уже в исходном порядке
+
+    filteredVideos = tempVideos;
+    currentVideoIndex = 0; // Сбрасываем индекс на первое видео в новом списке
+    renderVideos();
+    if (filteredVideos.length > 0) {
+        updateVideoDisplay(currentVideoIndex);
+    } else {
+        // Если нет видео, очищаем счетчики и кнопки
+        likeCount.textContent = '0';
+        commentCount.textContent = '0';
+        likeBtn.classList.remove('active');
+        likeBtn.innerHTML = '<i class="far fa-heart"></i><span class="control-count" id="likeCount">0</span>';
+        saveBtn.classList.remove('active');
+        saveBtn.innerHTML = '<i class="far fa-bookmark"></i>';
+        subscribeBtn.classList.remove('active');
+        subscribeBtn.innerHTML = '<i class="fas fa-user-plus"></i>';
+    }
+    updateSearchInputColor(); // Обновляем цвет текста в поисковой строке после применения фильтров
+}
+
+// Функция для обновления цвета текста в поисковой строке в зависимости от видео
+function updateSearchInputColor() {
+    // В реальном приложении здесь могла бы быть логика анализа текущего видео
+    // Например, определение преобладающего цвета или яркости видео.
+    // Для демонстрации, предположим, что все наши видео достаточно темные,
+    // и белый текст будет хорошо виден.
+    // Если бы были светлые видео, можно было бы менять на 'black' или 'var(--dark)'.
+
+    // Пример: если бы у видео был параметр `isLightBackground: true`
+    // const currentVideo = filteredVideos[currentVideoIndex];
+    // if (currentVideo && currentVideo.isLightBackground) {
+    //     document.documentElement.style.setProperty('--search-text-color', 'var(--dark)');
+    //     document.documentElement.style.setProperty('--search-placeholder-color', 'var(--dark-light)');
+    // } else {
+    //     document.documentElement.style.setProperty('--search-text-color', 'var(--light)');
+    //     document.documentElement.style.setProperty('--search-placeholder-color', 'var(--gray)');
+    // }
+
+    // Пока просто устанавливаем светлый текст для всех видео
+    document.documentElement.style.setProperty('--search-text-color', 'var(--light)');
+    document.documentElement.style.setProperty('--search-placeholder-color', 'var(--gray)');
 }

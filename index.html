@@ -14,6 +14,10 @@
     <div id="mainPage">
         <header class="header">
             <h1 class="logo">ТочкаСхода</h1>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Поиск видео..." class="search-input">
+                <button id="searchBtn" class="search-btn"><i class="fas fa-search"></i></button>
+            </div>
             <div id="userMenu" class="user-menu">
                 <span id="userName" class="user-name">Гость</span>
                 <button id="profileBtn" class="auth-btn">Профиль</button>
@@ -78,6 +82,20 @@
                         </div>
                         <span id="profileUsername" class="profile-username">Гость</span>
                         <span id="profileEmail" class="profile-email">guest@example.com</span>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-value" id="profileLikesCount">0</span>
+                                <span class="stat-label">Лайков</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="profileCommentsCount">0</span>
+                                <span class="stat-label">Комментариев</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="profileSubscriptionsCount">0</span>
+                                <span class="stat-label">Подписок</span>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="profile-section">
@@ -100,6 +118,47 @@
                             <!-- Список уведомлений будет здесь -->
                         </div>
                     </div>
+
+                    <div class="profile-section">
+                        <h4><i class="fas fa-cog"></i> Настройки:</h4>
+                        <div class="settings-list">
+                            <button class="setting-item">Изменить имя пользователя</button>
+                            <button class="setting-item">Изменить email</button>
+                            <button class="setting-item danger">Выйти</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно фильтров/поиска -->
+        <div id="filterModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Фильтры и поиск</h3>
+                    <button id="closeFilterModal" class="close-btn">&times;</button>
+                </div>
+                <div class="filter-content">
+                    <div class="filter-section">
+                        <h4>Категории:</h4>
+                        <div class="category-buttons">
+                            <button class="filter-category-btn active" data-category="all">Все</button>
+                            <button class="filter-category-btn" data-category="travel">Путешествия</button>
+                            <button class="filter-category-btn" data-category="humor">Юмор</button>
+                            <button class="filter-category-btn" data-category="food">Еда</button>
+                            <button class="filter-category-btn" data-category="sport">Спорт</button>
+                            <button class="filter-category-btn" data-category="music">Музыка</button>
+                        </div>
+                    </div>
+                    <div class="filter-section">
+                        <h4>Сортировка:</h4>
+                        <div class="sort-options">
+                            <button class="filter-sort-btn active" data-sort="default">По умолчанию</button>
+                            <button class="filter-sort-btn" data-sort="likes">По лайкам</button>
+                            <button class="filter-sort-btn" data-sort="comments">По комментариям</button>
+                        </div>
+                    </div>
+                    <button id="applyFiltersBtn" class="btn-primary">Применить</button>
                 </div>
             </div>
         </div>

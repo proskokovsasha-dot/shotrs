@@ -26,6 +26,10 @@
     --text-color: #E0E0E0; /* Off-white for general text */
     --border-color: rgba(255, 255, 255, 0.1);
     --gradient-bg: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+
+    /* Новые переменные для цвета текста поиска */
+    --search-text-color: var(--light);
+    --search-placeholder-color: var(--gray);
 }
 
 body {
@@ -61,6 +65,7 @@ body {
     background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
     z-index: 100;
     transition: transform 0.3s ease-in-out; /* Для анимации скрытия/показа */
+    gap: 15px; /* Добавляем отступ между элементами хедера */
 }
 
 .header.hidden {
@@ -73,6 +78,48 @@ body {
     background: linear-gradient(to right, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    flex-shrink: 0; /* Чтобы логотип не сжимался */
+    transition: all 0.3s ease-in-out; /* Для анимации скрытия/показа */
+}
+
+.search-container {
+    flex-grow: 1; /* Позволяет контейнеру поиска занимать доступное пространство */
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    padding: 5px 10px;
+    max-width: 400px; /* Ограничиваем ширину поиска */
+    transition: all 0.3s ease-in-out; /* Для анимации скрытия/показа */
+}
+
+.search-input {
+    flex-grow: 1;
+    border: none;
+    background: transparent;
+    color: var(--search-text-color); /* Используем новую переменную */
+    padding: 5px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: var(--search-placeholder-color); /* Используем новую переменную */
+}
+
+.search-btn {
+    background: none;
+    border: none;
+    color: var(--gray);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s;
+}
+
+.search-btn:hover {
+    color: var(--primary);
 }
 
 .user-menu {
@@ -84,7 +131,14 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
     color: var(--light);
-    margin-right: 0;
+    flex-shrink: 0; /* Чтобы меню пользователя не сжималось */
+    transition: all 0.3s ease-in-out; /* Для анимации скрытия/показа */
+}
+
+.user-menu.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(100%);
 }
 
 .user-name {
@@ -491,6 +545,34 @@ body {
     color: var(--gray);
 }
 
+.profile-stats {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--secondary);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
 .profile-section {
     background-color: var(--dark);
     padding: 15px;
@@ -670,6 +752,39 @@ body {
     padding: 10px;
 }
 
+/* Стили для настроек профиля */
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.setting-item {
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--dark-light);
+    color: var(--text-color);
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.setting-item:hover {
+    background-color: rgba(var(--primary), 0.1);
+    color: var(--primary);
+}
+
+.setting-item.danger {
+    color: var(--error);
+}
+
+.setting-item.danger:hover {
+    background-color: rgba(var(--error), 0.1);
+}
+
 /* Лоадер для видео */
 .video-loader {
     position: absolute;
@@ -746,11 +861,147 @@ body {
     background: linear-gradient(to right, var(--primary), var(--secondary));
 }
 
+/* Модальное окно фильтров */
+.filter-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.filter-section h4 {
+    margin-bottom: 10px;
+    color: var(--secondary);
+    font-size: 1.1rem;
+}
+
+.category-buttons, .sort-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-category-btn, .filter-sort-btn {
+    padding: 8px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background-color: var(--dark);
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.filter-category-btn.active, .filter-sort-btn.active {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: var(--light);
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.filter-category-btn:hover, .filter-sort-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.filter-category-btn.active:hover, .filter-sort-btn.active:hover {
+    transform: translateY(-2px);
+}
+
+#applyFiltersBtn {
+    margin-top: 20px;
+    align-self: center;
+    width: fit-content;
+}
+
 
 /* Адаптивность */
 @media (max-width: 768px) {
     .header {
         padding: 10px 15px;
+        flex-wrap: nowrap; /* Отключаем перенос элементов на новую строку */
+        justify-content: space-between; /* Распределяем элементы по краям */
+        gap: 10px; /* Уменьшаем отступ */
+    }
+
+    .logo {
+        width: auto; /* Возвращаем авто ширину */
+        text-align: left;
+        margin-bottom: 0;
+        font-size: 1.3rem; /* Уменьшаем размер логотипа */
+        flex-shrink: 1; /* Позволяем логотипу сжиматься, если нужно */
+    }
+
+    .search-container {
+        flex-grow: 0; /* Изначально не занимает все пространство */
+        max-width: fit-content; /* Ширина по содержимому */
+        margin-bottom: 0;
+        padding: 3px 8px; /* Уменьшаем отступы */
+        order: 2; /* Помещаем поиск в центр */
+        transition: all 0.3s ease-in-out;
+    }
+
+    .search-input {
+        font-size: 0.85rem; /* Уменьшаем размер шрифта */
+        width: 0; /* Изначально скрываем поле ввода */
+        padding: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: width 0.3s ease-in-out, padding 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    }
+
+    .search-btn {
+        font-size: 0.9rem; /* Уменьшаем размер кнопки */
+        padding: 5px;
+        flex-shrink: 0; /* Кнопка не сжимается */
+    }
+    
+    .user-menu {
+        gap: 8px;
+        padding: 3px 8px; /* Уменьшаем отступы */
+        font-size: 0.85rem; /* Уменьшаем размер шрифта */
+        order: 3; /* Помещаем меню пользователя в конец */
+        transition: all 0.3s ease-in-out;
+    }
+
+    .user-name {
+        font-size: 0.85rem;
+    }
+
+    .auth-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    /* Стили для активного поиска на мобильных */
+    .header.search-active .logo,
+    .header.search-active .user-menu {
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        flex-basis: 0; /* Уменьшаем базовый размер до 0 */
+        transition: all 0.3s ease-in-out;
+    }
+
+    .header.search-active .search-container {
+        flex-grow: 1;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        order: 1; /* Поиск становится первым элементом */
+        transition: all 0.3s ease-in-out;
+    }
+
+    .header.search-active .search-input {
+        width: 100%; /* Раскрываем поле ввода */
+        padding: 5px;
+        opacity: 1;
+        pointer-events: auto;
     }
     
     .video-info {
@@ -804,27 +1055,39 @@ body {
 
 @media (max-width: 480px) {
     .header {
-        padding: 10px;
+        padding: 8px 10px;
     }
     
     .logo {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }
     
     .auth-btn {
-        padding: 6px 12px;
-        font-size: 0.8rem;
+        padding: 5px 10px;
+        font-size: 0.75rem;
     }
     
     .user-menu {
-        gap: 8px;
-        padding: 4px 8px;
+        gap: 5px;
+        padding: 2px 6px;
     }
 
     .user-name {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
     }
     
+    .search-container {
+        padding: 2px 6px;
+    }
+
+    .search-input {
+        font-size: 0.8rem;
+    }
+
+    .search-btn {
+        font-size: 0.8rem;
+    }
+
     .video-info {
         bottom: 70px;
         left: 10px;
