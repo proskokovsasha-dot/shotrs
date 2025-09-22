@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
     profileAvatarLetter.textContent = currentUser.username.charAt(0).toUpperCase();
 });
 
-// Инициализация видео
+// Инициализация видео (без изменений)
 function initVideos() {
     videos = [
         {
@@ -153,7 +153,7 @@ function initVideos() {
     });
 }
 
-// Настройка обработчиков событий
+// Настройка обработчиков событий (без изменений)
 function setupEventListeners() {
     // Профиль
     profileBtn.addEventListener('click', showProfileModal);
@@ -182,7 +182,7 @@ function setupEventListeners() {
     setupMenuToggleOnSwipe(); // Добавляем обработчик для свайпа меню
 }
 
-// Показать уведомление
+// Показать уведомление (без изменений)
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -224,7 +224,7 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Рендеринг видео
+// Рендеринг видео (без изменений)
 function renderVideos() {
     videoCarousel.innerHTML = '';
     
@@ -288,7 +288,7 @@ function renderVideos() {
     });
 }
 
-// Показать анимацию лайка при двойном тапе/клике
+// Показать анимацию лайка при двойном тапе/клике (без изменений)
 function showDoubleTapLikeAnimation(x, y) {
     const likeAnimation = document.createElement('div');
     likeAnimation.className = 'double-tap-like-animation';
@@ -302,7 +302,7 @@ function showDoubleTapLikeAnimation(x, y) {
     });
 }
 
-// Обновление отображения видео
+// Обновление отображения видео (без изменений)
 function updateVideoDisplay(index) {
     if (isTransitioning || index < 0 || index >= videos.length) return;
     
@@ -370,7 +370,7 @@ function updateVideoDisplay(index) {
     currentVideoIndex = index;
 }
 
-// Обновление состояния кнопки сохранения
+// Обновление состояния кнопки сохранения (без изменений)
 function updateSaveButtonState(videoId) {
     if (savedVideos.has(videoId)) {
         saveBtn.classList.add('active');
@@ -381,7 +381,7 @@ function updateSaveButtonState(videoId) {
     }
 }
 
-// Обновление состояния кнопки подписки
+// Обновление состояния кнопки подписки (без изменений)
 function updateSubscribeButtonState(authorName) {
     if (subscriptions.has(authorName)) {
         subscribeBtn.classList.add('active');
@@ -394,7 +394,7 @@ function updateSubscribeButtonState(authorName) {
     }
 }
 
-// Форматирование счетчиков
+// Форматирование счетчиков (без изменений)
 function formatCount(count) {
     if (count >= 1000000) {
         return (count / 1000000).toFixed(1) + 'M';
@@ -404,7 +404,7 @@ function formatCount(count) {
     return count.toString();
 }
 
-// Настройка навигации по видео
+// Настройка навигации по видео (без изменений)
 function setupVideoNavigation() {
     let startY = 0;
     let isScrolling = false;
@@ -478,7 +478,7 @@ function setupVideoNavigation() {
     });
 }
 
-// Настройка скрытия/показа меню по свайпу
+// Настройка скрытия/показа меню по свайпу (без изменений)
 function setupMenuToggleOnSwipe() {
     let startX = 0;
     let startY = 0;
@@ -520,7 +520,7 @@ function setupMenuToggleOnSwipe() {
     });
 }
 
-// Переключение видимости меню
+// Переключение видимости меню (без изменений)
 function toggleMenuVisibility(show) {
     menuVisible = show;
     if (menuVisible) {
@@ -532,7 +532,7 @@ function toggleMenuVisibility(show) {
     }
 }
 
-// Переключение лайка
+// Переключение лайка (без изменений)
 function toggleLike() {
     const video = videos[currentVideoIndex];
     
@@ -551,7 +551,7 @@ function toggleLike() {
     localStorage.setItem('likedVideos', JSON.stringify([...likedVideos]));
 }
 
-// Переключение сохранения видео
+// Переключение сохранения видео (без изменений)
 function toggleSaveVideo() {
     const video = videos[currentVideoIndex];
     
@@ -571,7 +571,7 @@ function toggleSaveVideo() {
     localStorage.setItem(`savedVideos_${currentUser.username}`, JSON.stringify([...savedVideos]));
 }
 
-// Переключение подписки на автора
+// Переключение подписки на автора (без изменений)
 function toggleSubscribe() {
     const video = videos[currentVideoIndex];
     const authorName = video.author;
@@ -596,7 +596,7 @@ function showComments() {
     commentText.focus();
     // Отключаем свайпы в Telegram Web App, пока модальное окно открыто
     if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.disableVerticalSwipes();
+        Telegram.WebApp.disableVerticalSwipes(); // Отключаем свайпы
     }
 }
 
@@ -606,11 +606,11 @@ function hideComments() {
     commentText.value = '';
     // Включаем свайпы в Telegram Web App, когда модальное окно закрыто
     if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.enableVerticalSwipes();
+        Telegram.WebApp.enableVerticalSwipes(); // Включаем свайпы обратно
     }
 }
 
-// Рендеринг комментариев
+// Рендеринг комментариев (без изменений)
 function renderComments(videoId) {
     commentsList.innerHTML = '';
     
@@ -635,7 +635,7 @@ function renderComments(videoId) {
     });
 }
 
-// Добавление комментария
+// Добавление комментария (без изменений)
 function addComment() {
     const text = commentText.value.trim();
     
@@ -670,14 +670,14 @@ function addComment() {
     addNotification(`Вы оставили комментарий к ролику "${video.title}"`);
 }
 
-// Поделиться видео
+// Поделиться видео (без изменений)
 function shareVideo() {
     const video = videos[currentVideoIndex];
     
     if (navigator.share) {
         navigator.share({
             title: video.title,
-            text: 'Посмотрите это видео: ' + video.title,
+            text: 'Посмотрите это видео: ' + window.location.href,
             url: window.location.href
         })
         .catch(err => console.log('Ошибка при попытке поделиться:', err));
@@ -706,7 +706,7 @@ function showProfileModal() {
     profileModal.classList.add('active');
     // Отключаем свайпы в Telegram Web App, пока модальное окно открыто
     if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.disableVerticalSwipes();
+        Telegram.WebApp.disableVerticalSwipes(); // Отключаем свайпы
     }
 }
 
@@ -715,11 +715,11 @@ function hideProfileModal() {
     profileModal.classList.remove('active');
     // Включаем свайпы в Telegram Web App, когда модальное окно закрыто
     if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.enableVerticalSwipes();
+        Telegram.WebApp.enableVerticalSwipes(); // Включаем свайпы обратно
     }
 }
 
-// Рендеринг сохраненных видео
+// Рендеринг сохраненных видео (без изменений)
 function renderSavedVideos() {
     savedVideosList.innerHTML = '';
     
@@ -754,7 +754,7 @@ function renderSavedVideos() {
     });
 }
 
-// Рендеринг подписок
+// Рендеринг подписок (без изменений)
 function renderSubscriptions() {
     subscriptionsList.innerHTML = '';
     if (subscriptions.size === 0) {
@@ -788,7 +788,7 @@ function renderSubscriptions() {
     });
 }
 
-// Добавление уведомления
+// Добавление уведомления (без изменений)
 function addNotification(message) {
     const timestamp = new Date().toLocaleTimeString();
     notifications.unshift({ message, timestamp }); // Добавляем в начало
@@ -798,7 +798,7 @@ function addNotification(message) {
     localStorage.setItem(`notifications_${currentUser.username}`, JSON.stringify(notifications));
 }
 
-// Рендеринг уведомлений
+// Рендеринг уведомлений (без изменений)
 function renderNotifications() {
     notificationsList.innerHTML = '';
     if (notifications.length === 0) {
