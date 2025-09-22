@@ -17,7 +17,8 @@
                 <button id="registerBtn" class="auth-btn">Регистрация</button>
             </div>
             <div id="userMenu" class="user-menu hidden">
-                <span id="userName">Пользователь</span>
+                <span id="userName" class="user-name"></span>
+                <button id="profileBtn" class="auth-btn">Профиль</button>
                 <button id="logoutBtn" class="auth-btn">Выйти</button>
             </div>
         </header>
@@ -31,11 +32,15 @@
             <div class="control-group">
                 <button id="likeBtn" class="control-btn">
                     <i class="far fa-heart"></i>
-                    <span id="likeCount">0</span>
+                    <span class="control-count" id="likeCount">0</span>
                 </button>
                 <button id="commentBtn" class="control-btn">
                     <i class="far fa-comment"></i>
-                    <span id="commentCount">0</span>
+                    <span class="control-count" id="commentCount">0</span>
+                </button>
+                <button id="saveBtn" class="control-btn">
+                    <i class="far fa-bookmark"></i>
+                    <!-- Надпись "Сохранить" удалена -->
                 </button>
                 <button id="shareBtn" class="control-btn">
                     <i class="fas fa-share"></i>
@@ -47,7 +52,7 @@
         <div id="authModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Войдите в аккаунт</h3>
+                    <h3 id="authModalTitle">Войдите в аккаунт</h3>
                     <button id="closeAuthModal" class="close-btn">&times;</button>
                 </div>
                 <div class="auth-forms">
@@ -92,6 +97,24 @@
                 <div class="comment-input">
                     <input type="text" id="commentText" placeholder="Напишите комментарий...">
                     <button id="postComment" class="btn-primary">Отправить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно профиля -->
+        <div id="profileModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Профиль пользователя</h3>
+                    <button id="closeProfileModal" class="close-btn">&times;</button>
+                </div>
+                <div class="profile-content">
+                    <p><strong>Имя пользователя:</strong> <span id="profileUsername"></span></p>
+                    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+                    <h4>Сохраненные видео:</h4>
+                    <div id="savedVideosList" class="saved-videos-list">
+                        <!-- Сохраненные видео будут здесь -->
+                    </div>
                 </div>
             </div>
         </div>

@@ -61,8 +61,18 @@ body {
 .user-menu {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px; /* Увеличиваем расстояние между элементами */
+    padding: 5px 10px; /* Добавляем небольшой внутренний отступ */
+    border-radius: 20px; /* Скругляем углы для эстетики */
+    background-color: rgba(255, 255, 255, 0.1); /* Легкий фон для выделения */
+    backdrop-filter: blur(5px); /* Размытие фона */
     color: var(--light);
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--light);
+    white-space: nowrap; /* Предотвращаем перенос имени пользователя */
 }
 
 .auth-btn {
@@ -170,11 +180,11 @@ body {
     flex-shrink: 0; /* Предотвращаем сжатие аватара */
 }
 
-/* Элементы управления видео теперь слева */
+/* Элементы управления видео теперь справа */
 .video-controls {
     position: fixed;
     bottom: 20px; /* Отступ снизу */
-    left: 20px; /* Отступ слева */
+    right: 20px; /* Отступ справа */
     display: flex;
     flex-direction: column; /* Элементы управления располагаются вертикально */
     gap: 15px; /* Расстояние между кнопками */
@@ -184,39 +194,56 @@ body {
 .control-group {
     display: flex;
     flex-direction: column; /* Кнопки внутри группы также вертикально */
+    align-items: center; /* Центрируем элементы по горизонтали */
     gap: 15px;
     background-color: rgba(30, 30, 30, 0.7);
-    padding: 15px; /* Уменьшаем padding для вертикального расположения */
+    padding: 15px 10px; /* Уменьшаем padding по горизонтали для компактности */
     border-radius: 30px;
     backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Добавляем тень для объема */
 }
 
 .control-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center; /* Центрируем иконку и текст */
     gap: 5px;
     background: none;
     border: none;
     color: var(--light);
-    font-size: 1.2rem;
+    font-size: 1.3rem; /* Увеличиваем размер иконок */
     cursor: pointer;
-    transition: all 0.3s;
-    padding: 10px;
-    border-radius: 50%;
+    transition: all 0.3s ease; /* Более плавный переход */
+    padding: 8px; /* Уменьшаем padding для компактности */
+    border-radius: 50%; /* Делаем кнопки круглыми */
+    width: 50px; /* Фиксированная ширина */
+    height: 50px; /* Фиксированная высота */
+    position: relative; /* Для позиционирования счетчика */
 }
 
 .control-btn:hover {
     transform: scale(1.1);
     color: var(--primary); /* Добавляем эффект при наведении */
+    background-color: rgba(255, 255, 255, 0.1); /* Легкий фон при наведении */
 }
 
 .control-btn.active {
     color: var(--secondary);
 }
 
-.control-btn span {
-    font-size: 0.8rem;
+/* Отступы для счетчиков */
+.control-count {
+    font-size: 0.75rem; /* Немного уменьшаем размер текста счетчика */
+    font-weight: 600;
+    position: absolute; /* Позиционируем счетчик */
+    bottom: 5px; /* Отступ снизу */
+    left: 50%;
+    transform: translateX(-50%); /* Центрируем */
+    background-color: rgba(0, 0, 0, 0.5); /* Фон для счетчика */
+    padding: 2px 6px;
+    border-radius: 10px;
+    white-space: nowrap; /* Предотвращаем перенос строки */
 }
 
 /* Модальные окна */
@@ -246,6 +273,7 @@ body {
     max-height: 80vh;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); /* Улучшенная тень для модалки */
 }
 
 .modal-header {
@@ -262,6 +290,11 @@ body {
     color: var(--light);
     font-size: 1.5rem;
     cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: var(--secondary);
 }
 
 /* Формы авторизации */
@@ -322,6 +355,11 @@ body {
     color: var(--secondary);
     cursor: pointer;
     font-weight: 600;
+    transition: color 0.3s;
+}
+
+.auth-switch span:hover {
+    color: var(--primary);
 }
 
 /* Комментарии */
@@ -336,6 +374,9 @@ body {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
+    background-color: var(--dark); /* Фон для каждого комментария */
+    padding: 10px;
+    border-radius: 10px;
 }
 
 .comment-avatar {
@@ -358,6 +399,7 @@ body {
 .comment-author {
     font-weight: 600;
     margin-bottom: 5px;
+    color: var(--primary); /* Цвет имени автора */
 }
 
 .comment-text {
@@ -380,7 +422,78 @@ body {
     background-color: var(--dark);
     color: var(--light);
     outline: none;
+    transition: box-shadow 0.3s;
 }
+
+.comment-input input:focus {
+    box-shadow: 0 0 0 2px var(--secondary);
+}
+
+/* Профиль пользователя */
+.profile-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.profile-content p {
+    font-size: 1rem;
+    color: var(--light);
+}
+
+.profile-content strong {
+    color: var(--primary);
+}
+
+.saved-videos-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px; /* Для скроллбара */
+}
+
+.saved-video-item {
+    position: relative;
+    width: 100%;
+    padding-top: 75%; /* 4:3 aspect ratio */
+    background-color: var(--dark);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.saved-video-item:hover {
+    transform: scale(1.05);
+}
+
+.saved-video-item video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.saved-video-item .video-title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: var(--light);
+    padding: 5px;
+    font-size: 0.75rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 
 /* Адаптивность */
 @media (max-width: 768px) {
@@ -396,11 +509,22 @@ body {
     
     .video-controls {
         bottom: 15px;
-        left: 15px;
+        right: 15px; /* Перемещаем вправо */
     }
     
     .control-group {
-        padding: 12px;
+        padding: 12px 8px; /* Адаптируем padding */
+    }
+    
+    .control-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
+    }
+
+    .control-count { /* Изменено с .control-btn span на .control-count */
+        font-size: 0.7rem;
+        bottom: 3px;
     }
     
     .modal-content {
@@ -422,6 +546,15 @@ body {
         font-size: 0.8rem;
     }
     
+    .user-menu {
+        gap: 10px;
+        padding: 3px 8px;
+    }
+
+    .user-name {
+        font-size: 0.9rem;
+    }
+    
     .video-info {
         bottom: 70px;
         left: 10px;
@@ -434,15 +567,30 @@ body {
     
     .video-controls {
         bottom: 10px;
-        left: 10px;
+        right: 10px; /* Перемещаем вправо */
     }
     
     .control-group {
         gap: 10px;
-        padding: 10px;
+        padding: 10px 6px;
     }
     
+    .control-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .control-count { /* Изменено с .control-btn span на .control-count */
+        font-size: 0.65rem;
+        bottom: 2px;
+    }
+
     .modal-content {
         width: 98%;
+    }
+
+    .saved-videos-list {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
 }
