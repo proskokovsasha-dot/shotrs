@@ -123,7 +123,7 @@ function initVideos() {
     videos = [
         {
             id: 1,
-            title: "Удивительные места мира",
+            title: "Удивительные места мира #путешествия #природа",
             author: "Путешественник",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
             likes: 1245,
@@ -133,7 +133,7 @@ function initVideos() {
         },
         {
             id: 2,
-            title: "Смешные животные",
+            title: "Смешные животные #юмор #животные",
             author: "ЗооБлог",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
             likes: 3567,
@@ -143,7 +143,7 @@ function initVideos() {
         },
         {
             id: 3,
-            title: "Кулинарный мастер-класс: Итальянская паста",
+            title: "Кулинарный мастер-класс: Итальянская паста #еда #кулинария",
             author: "ШефПовар",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
             likes: 892,
@@ -153,7 +153,7 @@ function initVideos() {
         },
         {
             id: 4,
-            title: "Экстремальный спорт: Прыжки с парашютом",
+            title: "Экстремальный спорт: Прыжки с парашютом #спорт #экстрим",
             author: "Адреналин",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
             likes: 2109,
@@ -163,7 +163,7 @@ function initVideos() {
         },
         {
             id: 5,
-            title: "Музыкальный клип: Новая волна",
+            title: "Музыкальный клип: Новая волна #музыка #клип",
             author: "Артист",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
             likes: 3102,
@@ -173,7 +173,7 @@ function initVideos() {
         },
         {
             id: 6,
-            title: "Путешествие по Норвегии",
+            title: "Путешествие по Норвегии #путешествия #норвегия",
             author: "Путешественник",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
             likes: 1500,
@@ -183,7 +183,7 @@ function initVideos() {
         },
         {
             id: 7,
-            title: "Забавные котики",
+            title: "Забавные котики #животные #котики",
             author: "ЗооБлог",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
             likes: 4000,
@@ -193,7 +193,7 @@ function initVideos() {
         },
         {
             id: 8,
-            title: "Быстрые рецепты для завтрака",
+            title: "Быстрые рецепты для завтрака #еда #завтрак",
             author: "ШефПовар",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
             likes: 950,
@@ -203,7 +203,7 @@ function initVideos() {
         },
         {
             id: 9,
-            title: "Топ-10 мест для дайвинга",
+            title: "Топ-10 мест для дайвинга #путешествия #дайвинг",
             author: "Подводный Мир",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", // Используем существующее видео
             likes: 1800,
@@ -213,7 +213,7 @@ function initVideos() {
         },
         {
             id: 10,
-            title: "Лучшие приколы 2023",
+            title: "Лучшие приколы 2023 #юмор #приколы",
             author: "Смеха ради",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4", // Используем существующее видео
             likes: 5200,
@@ -223,7 +223,7 @@ function initVideos() {
         },
         {
             id: 11,
-            title: "Как приготовить идеальный стейк",
+            title: "Как приготовить идеальный стейк #еда #кулинария",
             author: "Мясной Эксперт",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4", // Используем существующее видео
             likes: 2300,
@@ -233,7 +233,7 @@ function initVideos() {
         },
         {
             id: 12,
-            title: "Тренировка для всего тела дома",
+            title: "Тренировка для всего тела дома #спорт #фитнес",
             author: "Фитнес Гуру",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4", // Используем существующее видео
             likes: 2900,
@@ -243,7 +243,7 @@ function initVideos() {
         },
         {
             id: 13,
-            title: "Инди-музыка: Открытие новых талантов",
+            title: "Инди-музыка: Открытие новых талантов #музыка #инди",
             author: "Музыкальный Критик",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Используем существующее видео
             likes: 1100,
@@ -253,7 +253,7 @@ function initVideos() {
         },
         {
             id: 14,
-            title: "Загадки древних цивилизаций",
+            title: "Загадки древних цивилизаций #наука #история",
             author: "Историк",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", // Используем существующее видео
             likes: 1700,
@@ -263,7 +263,7 @@ function initVideos() {
         },
         {
             id: 15,
-            title: "Обзор новых технологий 2024",
+            title: "Обзор новых технологий 2024 #технологии #гаджеты",
             author: "ТехноБлогер",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", // Используем существующее видео
             likes: 3800,
@@ -273,7 +273,7 @@ function initVideos() {
         },
         {
             id: 16,
-            title: "Уроки рисования для начинающих",
+            title: "Уроки рисования для начинающих #искусство #рисование",
             author: "Художник",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", // Используем существующее видео
             likes: 900,
@@ -283,7 +283,7 @@ function initVideos() {
         },
         {
             id: 17,
-            title: "Секреты продуктивности",
+            title: "Секреты продуктивности #образование #лайфхаки",
             author: "Лайфхакер",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4", // Используем существующее видео
             likes: 1400,
@@ -293,7 +293,7 @@ function initVideos() {
         },
         {
             id: 18,
-            title: "Космические тайны: Черные дыры",
+            title: "Космические тайны: Черные дыры #наука #космос",
             author: "Астрофизик",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4", // Используем существующее видео
             likes: 2500,
@@ -303,7 +303,7 @@ function initVideos() {
         },
         {
             id: 19,
-            title: "Лучшие моменты из игр",
+            title: "Лучшие моменты из игр #игры #гейминг",
             author: "Геймер",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4", // Используем существующее видео
             likes: 4100,
@@ -313,7 +313,7 @@ function initVideos() {
         },
         {
             id: 20,
-            title: "Уютный дом: Идеи для интерьера",
+            title: "Уютный дом: Идеи для интерьера #лайфстайл #дизайн",
             author: "Дизайнер",
             videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", // Используем существующее видео
             likes: 1000,
@@ -516,6 +516,10 @@ function renderVideos() {
         const videoItem = document.createElement('div');
         videoItem.className = `video-item ${index === currentVideoIndex ? 'active' : ''}`;
         videoItem.dataset.index = index;
+
+        // Извлекаем хештеги из заголовка для отображения
+        const titleWithoutHashtags = video.title.replace(/#(\w+)/g, '').trim();
+        const hashtagsInTitle = (video.title.match(/#(\w+)/g) || []).map(tag => `<span class="hashtag-link">${tag}</span>`).join(' ');
         
         videoItem.innerHTML = `
             <div class="video-loader"></div> <!-- Лоадер -->
@@ -524,7 +528,8 @@ function renderVideos() {
                 Ваш браузер не поддерживает видео.
             </video>
             <div class="video-info">
-                <h3 class="video-title">${video.title}</h3>
+                <h3 class="video-title">${titleWithoutHashtags}</h3>
+                <div class="video-hashtags">${hashtagsInTitle}</div>
                 <div class="video-author">
                     <div class="author-avatar">${video.author.charAt(0)}</div>
                     <span>${video.author}</span>
@@ -533,6 +538,18 @@ function renderVideos() {
         `;
         
         videoCarousel.appendChild(videoItem);
+
+        // Добавляем обработчики кликов для хештегов
+        videoItem.querySelectorAll('.hashtag-link').forEach(hashtagSpan => {
+            hashtagSpan.addEventListener('click', (e) => {
+                e.stopPropagation(); // Предотвращаем всплытие события, чтобы не сработал двойной тап/клик на видео
+                const hashtag = hashtagSpan.textContent.substring(1); // Убираем '#'
+                searchInput.value = hashtag; // Устанавливаем хештег в поле поиска
+                currentSearchQuery = hashtag.toLowerCase();
+                applyFiltersAndRenderVideos();
+                showNotification(`Поиск по хештегу: #${hashtag}`, 'info');
+            });
+        });
 
         // Скрываем лоадер, когда видео готово к воспроизведению
         const videoElement = videoItem.querySelector('video');
@@ -800,10 +817,10 @@ function setupMenuToggleOnSwipe() {
             isSwiping = true;
             if (diffX > 0 && !menuVisible) { // Свайп вправо - показать меню
                 toggleMenuVisibility(true);
-                enableVideoSwipes(); // Включаем свайпы видео при показе меню
+                // enableVideoSwipes(); // Включаем свайпы видео при показе меню - это не нужно, так как меню не блокирует свайпы видео
             } else if (diffX < 0 && menuVisible) { // Свайп влево - скрыть меню
                 toggleMenuVisibility(false);
-                disableVideoSwipes(); // Отключаем свайпы видео при скрытии меню
+                // disableVideoSwipes(); // Отключаем свайпы видео при скрытии меню - это не нужно, так как меню не блокирует свайпы видео
             }
         }
     }, { passive: false });
@@ -819,11 +836,11 @@ function toggleMenuVisibility(show) {
     if (menuVisible) {
         header.classList.remove('hidden');
         videoControls.classList.remove('hidden');
-        enableVideoSwipes(); // Включаем свайпы видео
+        enableVideoSwipes(); // Включаем свайпы видео, если меню видно
     } else {
         header.classList.add('hidden');
         videoControls.classList.add('hidden');
-        disableVideoSwipes(); // Отключаем свайпы видео
+        // disableVideoSwipes(); // Отключаем свайпы видео, если меню скрыто - это не нужно, так как свайпы видео должны работать независимо от меню
     }
 }
 
@@ -839,7 +856,7 @@ function toggleLike() {
         likedVideos.add(video.id);
         likeBtn.classList.add('active');
         likeBtn.innerHTML = '<i class="fas fa-heart"></i><span class="control-count" id="likeCount">' + formatCount(video.likes + 1) + '</span>';
-        addNotification(`Вам понравился ролик "${video.title}"`);
+        addNotification(`Вам понравился ролик "${video.title.replace(/#(\w+)/g, '').trim()}"`);
     }
     
     // Сохраняем лайки в localStorage
@@ -888,7 +905,8 @@ function showComments() {
     const video = filteredVideos[currentVideoIndex];
     renderComments(video.id);
     commentModal.classList.add('active');
-    commentText.focus();
+    // Не фокусируемся на поле ввода сразу, чтобы не открывать клавиатуру
+    // commentText.focus(); 
     // Отключаем свайпы видео, пока модальное окно открыто
     disableVideoSwipes();
 }
@@ -958,7 +976,7 @@ function addComment() {
     // Прокручиваем к новому комментарию
     commentsList.scrollTop = commentsList.scrollHeight;
 
-    addNotification(`Вы оставили комментарий к ролику "${video.title}"`);
+    addNotification(`Вы оставили комментарий к ролику "${video.title.replace(/#(\w+)/g, '').trim()}"`);
 }
 
 // Поделиться видео
@@ -967,7 +985,7 @@ function shareVideo() {
     
     if (navigator.share) {
         navigator.share({
-            title: video.title,
+            title: video.title.replace(/#(\w+)/g, '').trim(),
             text: 'Посмотрите это видео: ' + window.location.href,
             url: window.location.href
         })
@@ -1043,7 +1061,7 @@ function renderSavedVideos() {
                 <video muted>
                     <source src="${video.videoUrl}" type="video/mp4">
                 </video>
-                <div class="video-title-overlay">${video.title}</div>
+                <div class="video-title-overlay">${video.title.replace(/#(\w+)/g, '').trim()}</div>
             `;
             
             videoItem.addEventListener('click', () => {
@@ -1153,12 +1171,15 @@ function hideFilterModal() {
 function applyFiltersAndRenderVideos() {
     let tempVideos = [...videos];
 
-    // 1. Поиск по названию, автору, тегам
+    // 1. Поиск по названию, автору, тегам и хештегам
     if (currentSearchQuery) {
+        const searchQueryLower = currentSearchQuery.toLowerCase();
         tempVideos = tempVideos.filter(video => 
-            video.title.toLowerCase().includes(currentSearchQuery) ||
-            video.author.toLowerCase().includes(currentSearchQuery) ||
-            (video.tags && video.tags.some(tag => tag.toLowerCase().includes(currentSearchQuery)))
+            video.title.toLowerCase().includes(searchQueryLower) ||
+            video.author.toLowerCase().includes(searchQueryLower) ||
+            (video.tags && video.tags.some(tag => tag.toLowerCase().includes(searchQueryLower))) ||
+            // Поиск по хештегам в заголовке
+            (video.title.match(/#(\w+)/g) || []).some(hashtag => hashtag.toLowerCase().includes(searchQueryLower))
         );
     }
 

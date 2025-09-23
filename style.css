@@ -152,7 +152,7 @@ body {
     border: none;
     border-radius: 20px;
     background-color: rgba(255, 255, 255, 0.2);
-    color: var(--light);
+    color: var(--light); /* Исправлено: цвет текста кнопки профиля */
     cursor: pointer;
     font-size: 0.9rem;
     transition: all 0.3s;
@@ -312,7 +312,7 @@ body {
 
 /* Модальные окна */
 .modal {
-    display: none;
+    display: flex; /* Всегда flex, но скрываем через opacity/pointer-events */
     position: fixed;
     top: 0;
     left: 0;
@@ -323,12 +323,13 @@ body {
     justify-content: center;
     align-items: center;
     opacity: 0;
+    pointer-events: none; /* Скрываем от взаимодействия */
     transition: opacity 0.3s ease-in-out;
 }
 
 .modal.active {
-    display: flex;
     opacity: 1;
+    pointer-events: auto; /* Разрешаем взаимодействие */
 }
 
 .modal-content {
@@ -964,6 +965,12 @@ body {
         font-size: 0.85rem; /* Уменьшаем размер шрифта */
         order: 3; /* Помещаем меню пользователя в конец */
         transition: all 0.3s ease-in-out;
+    }
+
+    .user-menu.hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(100%);
     }
 
     .user-name {
