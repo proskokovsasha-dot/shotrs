@@ -220,6 +220,17 @@ body {
     font-weight: 600;
 }
 
+.video-hashtags .hashtag-link {
+    color: var(--secondary);
+    text-decoration: none;
+    margin-right: 5px;
+    font-weight: 500;
+}
+
+.video-hashtags .hashtag-link:hover {
+    text-decoration: underline;
+}
+
 .video-author {
     display: flex;
     align-items: center;
@@ -689,13 +700,6 @@ body {
     background-color: rgba(var(--primary), 0.1);
 }
 
-.subscription-item .author-avatar {
-    width: 35px;
-    height: 35px;
-    font-size: 0.9rem;
-    box-shadow: none;
-}
-
 .subscription-item span {
     flex-grow: 1;
     font-weight: 500;
@@ -784,6 +788,19 @@ body {
 
 .setting-item.danger:hover {
     background-color: rgba(var(--error), 0.1);
+}
+
+/* Стили для демографии аудитории */
+.audience-demographics {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.audience-demographics p {
+    margin: 0;
 }
 
 /* Лоадер для видео */
@@ -917,6 +934,73 @@ body {
     width: fit-content;
 }
 
+/* Стили для рекламных видео */
+.ad-label {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(var(--primary), 0.8);
+    color: var(--light);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    z-index: 5;
+}
+
+/* Стили для модального окна премиум-подписки */
+.premium-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+}
+
+.premium-content h4 {
+    color: var(--secondary);
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.premium-content p {
+    color: var(--text-color);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.premium-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    text-align: left;
+    width: 100%;
+    max-width: 250px;
+}
+
+.premium-content ul li {
+    background-color: var(--dark);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--light);
+    font-size: 0.9rem;
+}
+
+.premium-content ul li i {
+    color: var(--success);
+    font-size: 1.1rem;
+}
+
+.premium-content .btn-primary {
+    width: 100%;
+    max-width: 200px;
+    margin-top: 10px;
+}
 
 /* Адаптивность */
 @media (max-width: 768px) {
@@ -1023,6 +1107,7 @@ body {
     }
     
     .control-group {
+        gap: 10px;
         padding: 12px 8px;
     }
     
@@ -1057,6 +1142,13 @@ body {
 
     .saved-videos-list, .subscriptions-list, .notifications-list {
         max-height: 150px;
+    }
+
+    .ad-label {
+        top: 15px;
+        right: 15px;
+        padding: 4px 8px;
+        font-size: 0.7rem;
     }
 }
 

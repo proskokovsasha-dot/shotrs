@@ -86,6 +86,10 @@
                         <span id="profileEmail" class="profile-email">guest@example.com</span>
                         <div class="profile-stats">
                             <div class="stat-item">
+                                <span class="stat-value" id="profileViewsCount">0</span>
+                                <span class="stat-label">Просмотров</span>
+                            </div>
+                            <div class="stat-item">
                                 <span class="stat-value" id="profileLikesCount">0</span>
                                 <span class="stat-label">Лайков</span>
                             </div>
@@ -100,6 +104,19 @@
                         </div>
                     </div>
                     
+                    <div class="profile-section">
+                        <h4><i class="fas fa-star"></i> Премиум-подписка:</h4>
+                        <p>Статус: <span id="premiumStatus">Неактивна</span></p>
+                        <button id="activatePremiumBtn" class="btn-primary" style="display: none;">Активировать Премиум</button>
+                    </div>
+
+                    <div class="profile-section">
+                        <h4><i class="fas fa-chart-pie"></i> Демография аудитории:</h4>
+                        <div id="profileAudienceDemographics" class="audience-demographics">
+                            <!-- Демография аудитории будет здесь -->
+                        </div>
+                    </div>
+
                     <div class="profile-section">
                         <h4><i class="fas fa-bookmark"></i> Сохраненные видео:</h4>
                         <div id="savedVideosList" class="saved-videos-list">
@@ -167,6 +184,26 @@
                         </div>
                     </div>
                     <button id="applyFiltersBtn" class="btn-primary">Применить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно премиум-подписки -->
+        <div id="premiumModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Премиум-подписка</h3>
+                    <button id="closePremiumModal" class="close-btn">&times;</button>
+                </div>
+                <div class="premium-content">
+                    <h4>Получите максимум от ТочкаСхода!</h4>
+                    <p>Оформите премиум-подписку и наслаждайтесь просмотром без ограничений:</p>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Просмотр видео без рекламы</li>
+                        <li><i class="fas fa-check-circle"></i> Эксклюзивный контент (скоро!)</li>
+                        <li><i class="fas fa-check-circle"></i> Приоритетная поддержка</li>
+                    </ul>
+                    <button id="confirmActivatePremiumBtn" class="btn-primary">Активировать Премиум за 99 ₽/мес</button>
                 </div>
             </div>
         </div>
