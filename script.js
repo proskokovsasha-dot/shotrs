@@ -389,8 +389,12 @@ function setupEventListeners() {
             header.classList.toggle('search-active');
             if (header.classList.contains('search-active')) {
                 searchInput.focus(); // Фокусируемся на поле ввода
+                // Отключаем свайпы видео, когда поиск активен
+                disableVideoSwipes();
             } else {
                 searchInput.blur(); // Убираем фокус
+                // Включаем свайпы видео, когда поиск неактивен
+                enableVideoSwipes();
             }
         } else { // Для десктопных устройств
             showFilterModal(); // Открываем модальное окно фильтров
@@ -402,6 +406,8 @@ function setupEventListeners() {
         if (window.innerWidth <= 768) { // Применяем только для мобильных
             header.classList.add('search-active');
             userMenu.classList.add('hidden');
+            // Отключаем свайпы видео, когда поиск активен
+            disableVideoSwipes();
         }
     });
 
@@ -411,6 +417,8 @@ function setupEventListeners() {
             if (searchInput.value === '') {
                 header.classList.remove('search-active');
                 userMenu.classList.remove('hidden');
+                // Включаем свайпы видео, когда поиск неактивен
+                enableVideoSwipes();
             }
         }
     });
@@ -435,6 +443,18 @@ function setupEventListeners() {
         applyFiltersAndRenderVideos();
         hideFilterModal();
     });
+}
+
+// Глобальные переменные для управления свайпами видео
+let videoSwipeEnabled = true;
+
+// Функции для включения/отключения свайпов видео
+function disableVideoSwipes() {
+    videoSwipeEnabled = false;
+}
+
+function enableVideoSwipes() {
+    videoSwipeEnabled = true;
 }
 
 // Показать уведомление
@@ -683,8 +703,8 @@ function setupVideoNavigation() {
     }, { passive: false }); // passive: false для предотвращения прокрутки страницы
 
     document.addEventListener('touchmove', (e) => {
-        // Если открыто модальное окно, не обрабатываем свайпы для видео
-        if (commentModal.classList.contains('active') || profileModal.classList.contains('active') || filterModal.classList.contains('active')) {
+        // Если свайпы видео отключены, или открыто модальное окно, не обрабатываем свайпы для видео
+        if (!videoSwipeEnabled || commentModal.classList.contains('active') || profileModal.classList.contains('active') || filterModal.classList.contains('active')) {
             return;
         }
 
@@ -762,6 +782,10 @@ function setupMenuToggleOnSwipe() {
         if (commentModal.classList.contains('active') || profileModal.classList.contains('active') || filterModal.classList.contains('active')) {
             return;
         }
+        // Если поиск активен, не обрабатываем свайпы для меню
+        if (header.classList.contains('search-active')) {
+            return;
+        }
 
         if (isSwiping) return; 
         
@@ -776,8 +800,10 @@ function setupMenuToggleOnSwipe() {
             isSwiping = true;
             if (diffX > 0 && !menuVisible) { // Свайп вправо - показать меню
                 toggleMenuVisibility(true);
+                enableVideoSwipes(); // Включаем свайпы видео при показе меню
             } else if (diffX < 0 && menuVisible) { // Свайп влево - скрыть меню
                 toggleMenuVisibility(false);
+                disableVideoSwipes(); // Отключаем свайпы видео при скрытии меню
             }
         }
     }, { passive: false });
@@ -793,9 +819,11 @@ function toggleMenuVisibility(show) {
     if (menuVisible) {
         header.classList.remove('hidden');
         videoControls.classList.remove('hidden');
+        enableVideoSwipes(); // Включаем свайпы видео
     } else {
         header.classList.add('hidden');
         videoControls.classList.add('hidden');
+        disableVideoSwipes(); // Отключаем свайпы видео
     }
 }
 
@@ -861,20 +889,16 @@ function showComments() {
     renderComments(video.id);
     commentModal.classList.add('active');
     commentText.focus();
-    // Отключаем свайпы в Telegram Web App, пока модальное окно открыто
-    if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.disableVerticalSwipes(); // Отключаем свайпы
-    }
+    // Отключаем свайпы видео, пока модальное окно открыто
+    disableVideoSwipes();
 }
 
 // Скрыть комментарии
 function hideComments() {
     commentModal.classList.remove('active');
     commentText.value = '';
-    // Включаем свайпы в Telegram Web App, когда модальное окно закрыто
-    if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.enableVerticalSwipes(); // Включаем свайпы обратно
-    }
+    // Включаем свайпы видео, когда модальное окно закрыто
+    enableVideoSwipes();
 }
 
 // Рендеринг комментариев
@@ -974,19 +998,15 @@ function showProfileModal() {
     renderSubscriptions();
     renderNotifications();
     profileModal.classList.add('active');
-    // Отключаем свайпы в Telegram Web App, пока модальное окно открыто
-    if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.disableVerticalSwipes(); // Отключаем свайпы
-    }
+    // Отключаем свайпы видео, пока модальное окно открыто
+    disableVideoSwipes();
 }
 
 // Скрыть модальное окно профиля
 function hideProfileModal() {
     profileModal.classList.remove('active');
-    // Включаем свайпы в Telegram Web App, когда модальное окно закрыто
-    if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.enableVerticalSwipes(); // Включаем свайпы обратно
-    }
+    // Включаем свайпы видео, когда модальное окно закрыто
+    enableVideoSwipes();
 }
 
 // Обновление статистики профиля
@@ -1118,19 +1138,15 @@ function renderNotifications() {
 // Показать модальное окно фильтров
 function showFilterModal() {
     filterModal.classList.add('active');
-    // Отключаем свайпы в Telegram Web App, пока модальное окно открыто
-    if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.disableVerticalSwipes();
-    }
+    // Отключаем свайпы видео, пока модальное окно открыто
+    disableVideoSwipes();
 }
 
 // Скрыть модальное окно фильтров
 function hideFilterModal() {
     filterModal.classList.remove('active');
-    // Включаем свайпы в Telegram Web App, когда модальное окно закрыто
-    if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.enableVerticalSwipes();
-    }
+    // Включаем свайпы видео, когда модальное окно закрыто
+    enableVideoSwipes();
 }
 
 // Применение фильтров и рендеринг видео
